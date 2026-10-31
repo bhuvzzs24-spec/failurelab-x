@@ -1,0 +1,126 @@
+x-app: &app
+  build: .
+  image: failurelab-x:${BUILD_VERSION:-phase1-local}
+  init: true
+  read_only: true
+  tmpfs: [/tmp]
+  cap_drop: [ALL]
+  security_opt: [no-new-privileges:true]
+  networks: [sandbox]
+  environment: &env
+    DATABASE_URL: postgresql+psycopg://lab:${POSTGRES_PASSWORD:-local-lab-password}@postgres:5432/lab
+    API_TOKEN: ${API_TOKEN:-local-development-token}
+    BUILD_VERSION: ${BUILD_VERSION:-phase1-local}
+    REDIS_URL: redis://redis:6379/0
+  logging:
+    driver: json-file
+    options: {max-size: 10m, max-file: '3'}
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment: {POSTGRES_USER: lab, POSTGRES_DB: lab, POSTGRES_PASSWORD: '${POSTGRES_PASSWORD:-local-lab-password}'}
+    volumes: [lab-data:/var/lib/postgresql/data, './infrastructure/postgres-init.sql:/docker-entrypoint-initdb.d/001.sql:ro']
+    networks: [sandbox]
+    healthcheck: {test: ['CMD-SHELL', 'pg_isready -U lab -d lab'], interval: 2s, timeout: 2s, retries: 30}
+  demo-postgres:
+    image: postgres:16-alpine
+    environment: {POSTGRES_USER: demo, POSTGRES_DB: demo, POSTGRES_PASSWORD: '${DEMO_POSTGRES_PASSWORD:-local-demo-password}'}
+    volumes: [demo-data:/var/lib/postgresql/data, './demo-system/init.sql:/docker-entrypoint-initdb.d/001.sql:ro']
+    networks: [sandbox]
+    healthcheck: {test: ['CMD-SHELL', 'pg_isready -U demo -d demo'], interval: 2s, timeout: 2s, retries: 30}
+  redis:
+    image: redis:7-alpine
+    command: [redis-server, --appendonly, 'yes']
+    volumes: [redis-data:/data]
+    networks: [sandbox]
+    healthcheck: {test: [CMD, redis-cli, ping], interval: 2s, timeout: 2s, retries: 30}
+  migrate:
+    <<: *app
+    environment:
+      DATABASE_URL: postgresql+psycopg://lab:${POSTGRES_PASSWORD:-local-lab-password}@postgres:5432/lab
+    command: [alembic, upgrade, head]
+    depends_on: {postgres: {condition: service_healthy}}
+  api:
+    <<: *app
+    ports: ['127.0.0.1:8000:8000']
+    depends_on: {migrate: {condition: service_completed_successfully}, redis: {condition: service_healthy}}
+    healthcheck:
+      test: [CMD, python, -c, 'import urllib.request; urllib.request.urlopen("http://localhost:8000/ready")']
+      interval: 3s
+      timeout: 3s
+      retries: 30
+  worker:
+    <<: *app
+    environment:
+      <<: *env
+      CONTROL_TOKEN: ${CONTROL_TOKEN:-local-control-token}
+    command: [celery, -A, app.workers.tasks.celery, worker, --loglevel=INFO, --concurrency=2]
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+      redis: {condition: service_healthy}
+      gateway: {condition: service_healthy}
+      fault-proxy: {condition: service_healthy}
+  scheduler:
+    <<: *app
+    command: [celery, -A, app.workers.tasks.celery, beat, --loglevel=INFO, --schedule=/tmp/celerybeat]
+    depends_on: {migrate: {condition: service_completed_successfully}, redis: {condition: service_healthy}}
+  order:
+    <<: *app
+    command: [uvicorn, app.services.demo:create_app, --factory, --host, 0.0.0.0, --port, '8000', --no-access-log]
+    environment: &demo-env
+      DEMO_ROLE: order
+      DEMO_DATABASE_URL: postgresql+psycopg://demo:${DEMO_POSTGRES_PASSWORD:-local-demo-password}@demo-postgres:5432/demo
+      CONTROL_TOKEN: ${CONTROL_TOKEN:-local-control-token}
+      BUILD_VERSION: ${BUILD_VERSION:-phase1-local}
+    depends_on: {demo-postgres: {condition: service_healthy}}
+    healthcheck: &demo-health
+      test: [CMD, python, -c, 'import urllib.request; urllib.request.urlopen("http://localhost:8000/health")']
+      interval: 2s
+      timeout: 2s
+      retries: 30
+  inventory:
+    <<: *app
+    command: [uvicorn, app.services.demo:create_app, --factory, --host, 0.0.0.0, --port, '8000', --no-access-log]
+    environment: {<<: *demo-env, DEMO_ROLE: inventory}
+    depends_on: {demo-postgres: {condition: service_healthy}}
+    healthcheck: *demo-health
+  payment:
+    <<: *app
+    command: [uvicorn, app.services.demo:create_app, --factory, --host, 0.0.0.0, --port, '8000', --no-access-log]
+    environment: {<<: *demo-env, DEMO_ROLE: payment}
+    depends_on: {demo-postgres: {condition: service_healthy}}
+    healthcheck: *demo-health
+  fault-proxy:
+    <<: *app
+    environment:
+      CONTROL_TOKEN: ${CONTROL_TOKEN:-local-control-token}
+      BUILD_VERSION: ${BUILD_VERSION:-phase1-local}
+    command: [python, -m, app.faults.proxy]
+    depends_on: {payment: {condition: service_healthy}}
+    healthcheck:
+      test: [CMD, python, -c, 'import urllib.request; urllib.request.urlopen("http://localhost:8001/health")']
+      interval: 2s
+      timeout: 2s
+      retries: 30
+  gateway:
+    <<: *app
+    command: [uvicorn, app.services.demo:create_app, --factory, --host, 0.0.0.0, --port, '8000', --no-access-log]
+    environment: {<<: *demo-env, DEMO_ROLE: gateway}
+    depends_on:
+      order: {condition: service_healthy}
+      inventory: {condition: service_healthy}
+      fault-proxy: {condition: service_healthy}
+    healthcheck: *demo-health
+  tests:
+    <<: *app
+    profiles: [test]
+    read_only: false
+    environment: {<<: *env, PYTHONPATH: /srv/backend, TEST_REDIS_URL: 'redis://redis:6379/14', TEST_POSTGRES_URL: 'postgresql+psycopg://lab:${POSTGRES_PASSWORD:-local-lab-password}@postgres:5432/lab_test'}
+    command: [pytest, -q, -p, no:cacheprovider]
+    depends_on: {postgres: {condition: service_healthy}, redis: {condition: service_healthy}}
+networks:
+  sandbox: {internal: true}
+volumes:
+  lab-data:
+  demo-data:
+  redis-data:

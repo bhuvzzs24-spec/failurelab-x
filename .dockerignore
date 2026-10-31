@@ -1,0 +1,7 @@
+work
+.git
+.env
+*.db
+.pytest_cache
+**/__pycache__
+outputs

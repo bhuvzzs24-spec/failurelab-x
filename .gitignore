@@ -1,0 +1,39 @@
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*credentials*.json
+*secret*.json
+.secrets/
+# Runtime, generated files and sensitive experiment records
+work/
+outputs/
+logs/
+tmp/
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+*.rdb
+# Python
+__pycache__/
+*.pyc
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+# Frontend/build/test artifacts
+node_modules/
+.next/
+dist/
+build/
+coverage/
+playwright-report/
+test-results/
+*.tsbuildinfo
+.DS_Store

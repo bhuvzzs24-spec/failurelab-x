@@ -37,3 +37,20 @@ playwright-report/
 test-results/
 *.tsbuildinfo
 .DS_Store
+# Also exclude a developer's external-runtime symlink.
+node_modules
+# Credential-manager and local evidence files
+.npmrc
+.netrc
+.pypirc
+.aws/
+.ssh/
+.secrets/
+secrets/
+credentials/
+*.secret
+*.secrets
+/artifacts/
+/evidence/
+# Next.js regenerates this for development/build-specific route types.
+frontend/next-env.d.ts

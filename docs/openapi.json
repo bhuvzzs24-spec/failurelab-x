@@ -1891,6 +1891,384 @@
         }
       }
     },
+    "/api/v1/capabilities": {
+      "get": {
+        "summary": "Capabilities",
+        "operationId": "capabilities_api_v1_capabilities_get",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Capabilities"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/v1/projects/{project_id}/overview": {
+      "get": {
+        "summary": "Overview",
+        "operationId": "overview_api_v1_projects__project_id__overview_get",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Project Id"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectOverview"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/v1/projects/{project_id}/runs": {
+      "get": {
+        "summary": "Project Runs",
+        "operationId": "project_runs_api_v1_projects__project_id__runs_get",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Project Id"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "CREATED",
+                    "QUEUED",
+                    "RUNNING",
+                    "VERIFYING",
+                    "COMPLETED",
+                    "FAILED",
+                    "CANCELLED"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_RunOut_"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/v1/projects/{project_id}/findings": {
+      "get": {
+        "summary": "Project Findings",
+        "operationId": "project_findings_api_v1_projects__project_id__findings_get",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Project Id"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "",
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_FindingOut_"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Content"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          }
+        }
+      }
+    },
     "/health": {
       "get": {
         "summary": "Health",
@@ -2006,6 +2384,25 @@
   },
   "components": {
     "schemas": {
+      "ActivityPoint": {
+        "properties": {
+          "day": {
+            "type": "string",
+            "title": "Day"
+          },
+          "runs": {
+            "type": "integer",
+            "title": "Runs"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "day",
+          "runs"
+        ],
+        "title": "ActivityPoint"
+      },
       "ArtifactOut": {
         "properties": {
           "id": {
@@ -2045,6 +2442,84 @@
           "payload"
         ],
         "title": "ArtifactOut"
+      },
+      "Capabilities": {
+        "properties": {
+          "sandbox_id": {
+            "type": "string",
+            "title": "Sandbox Id"
+          },
+          "engine_version": {
+            "type": "string",
+            "title": "Engine Version"
+          },
+          "allowed_services": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Allowed Services"
+          },
+          "fault_targets": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Fault Targets"
+          },
+          "fault_kinds": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Fault Kinds"
+          },
+          "max_fault_seconds": {
+            "type": "number",
+            "title": "Max Fault Seconds"
+          },
+          "max_run_seconds": {
+            "type": "integer",
+            "title": "Max Run Seconds"
+          },
+          "automatic_replay": {
+            "type": "boolean",
+            "title": "Automatic Replay"
+          },
+          "causal_analysis": {
+            "type": "boolean",
+            "title": "Causal Analysis"
+          },
+          "minimization": {
+            "type": "boolean",
+            "title": "Minimization"
+          },
+          "repair_verification": {
+            "type": "boolean",
+            "title": "Repair Verification"
+          },
+          "logs_inline": {
+            "type": "boolean",
+            "title": "Logs Inline"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "sandbox_id",
+          "engine_version",
+          "allowed_services",
+          "fault_targets",
+          "fault_kinds",
+          "max_fault_seconds",
+          "max_run_seconds",
+          "automatic_replay",
+          "causal_analysis",
+          "minimization",
+          "repair_verification",
+          "logs_inline"
+        ],
+        "title": "Capabilities"
       },
       "Compare": {
         "properties": {
@@ -2875,6 +3350,77 @@
           "created_at"
         ],
         "title": "ProjectOut"
+      },
+      "ProjectOverview": {
+        "properties": {
+          "service_count": {
+            "type": "integer",
+            "title": "Service Count"
+          },
+          "experiment_count": {
+            "type": "integer",
+            "title": "Experiment Count"
+          },
+          "run_count": {
+            "type": "integer",
+            "title": "Run Count"
+          },
+          "active_run_count": {
+            "type": "integer",
+            "title": "Active Run Count"
+          },
+          "violation_count": {
+            "type": "integer",
+            "title": "Violation Count"
+          },
+          "artifact_count": {
+            "type": "integer",
+            "title": "Artifact Count"
+          },
+          "status_counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Status Counts"
+          },
+          "activity": {
+            "items": {
+              "$ref": "#/components/schemas/ActivityPoint"
+            },
+            "type": "array",
+            "title": "Activity"
+          },
+          "latest_runs": {
+            "items": {
+              "$ref": "#/components/schemas/RunOut"
+            },
+            "type": "array",
+            "title": "Latest Runs"
+          },
+          "latest_findings": {
+            "items": {
+              "$ref": "#/components/schemas/FindingOut"
+            },
+            "type": "array",
+            "title": "Latest Findings"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "service_count",
+          "experiment_count",
+          "run_count",
+          "active_run_count",
+          "violation_count",
+          "artifact_count",
+          "status_counts",
+          "activity",
+          "latest_runs",
+          "latest_findings"
+        ],
+        "title": "ProjectOverview"
       },
       "RunCreate": {
         "properties": {

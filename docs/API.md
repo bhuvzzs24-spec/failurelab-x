@@ -47,3 +47,12 @@ curl -X POST -H 'Authorization: Bearer TOKEN' -H 'Content-Type: application/json
 Run schemas separate lifecycle status from invariant status. Evaluation contains `status` PASS/FAIL/INCONCLUSIVE, `observed`, `expected`, `evidence_refs`, `evaluated_at`, nullable `reason`. FindingOut points at the invariant and full evaluation evidence. Fault configurations live in immutable experiment configuration and run snapshots rather than a separately editable catalog. The static `Fault` schema in OpenAPI defines the supported catalog.
 
 Graph service nodes expose HTTP method/path operations and shared resource labels; edges expose `http`, `shared_resource`, or `workflow` kind and workflow label. A graph asserts only explicit registration. Future span import must add source/provenance and confidence without treating a trace edge as proof of complete dependencies.
+
+## Additive Phase 2 read models
+
+- `GET /api/v1/capabilities`: actual engine limits/supported fault kinds and explicit feature availability; no secrets, DSNs or host paths.
+- `GET /api/v1/projects/{project_id}/overview`: project-wide SQL counts, status distribution, 14-day UTC run creation series, up to 12 recent runs and 8 recent findings. Counts are not limited to those recent lists.
+- `GET /api/v1/projects/{project_id}/runs`: offset/limit, optional exact status filter; ordered by creation descending with ID tie-breaker.
+- `GET /api/v1/projects/{project_id}/findings`: paginated project-scoped findings ordered by associated run creation and finding ID.
+
+These are authenticated additions; all existing Phase 1 routes remain unchanged and no database migration is required. The Next.js frontend uses a same-origin allowlisted server bridge, with the API token in a server environment variable. No CORS relaxation is needed.

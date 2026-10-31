@@ -111,6 +111,25 @@ services:
       inventory: {condition: service_healthy}
       fault-proxy: {condition: service_healthy}
     healthcheck: *demo-health
+  frontend:
+    build: ./frontend
+    image: failurelab-x-frontend:${BUILD_VERSION:-phase2-local}
+    init: true
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    networks: [sandbox]
+    ports: ['127.0.0.1:3000:3000']
+    environment:
+      BACKEND_URL: http://api:8000
+      API_TOKEN: ${API_TOKEN:-local-development-token}
+    depends_on: {api: {condition: service_healthy}}
+    healthcheck:
+      test: [CMD, node, -e, 'fetch("http://127.0.0.1:3000/api/backend/health").then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))']
+      interval: 5s
+      timeout: 3s
+      retries: 30
   tests:
     <<: *app
     profiles: [test]

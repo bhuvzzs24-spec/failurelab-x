@@ -92,3 +92,16 @@ sh scripts/reset.sh                       # DELETE this Compose project's volume
 Phase 1 supports one configured demo sandbox and one payment boundary, not arbitrary application onboarding. All operator origins must be an expected Compose hostname or loopback HTTP origin; registration cannot contain a URL. No privileged containers, Docker socket or host process control are used. Application containers are nonroot, read-only and drop capabilities. PostgreSQL containers use development bootstrap accounts on an internal network; separate migration/runtime DB roles, TLS, tenant isolation and external secret management remain deployment work.
 
 Replay is reproducible at the scenario level. A seed alone does not eliminate network/OS scheduling, database latency or image drift. Set `BUILD_VERSION` to a meaningful immutable image revision, archive container logs with the run's execution/trace IDs, and pin dependency/image digests before long-term research use. The bundled images are version tags rather than digest-pinned release artifacts.
+
+## Phase 2 frontend
+
+The Next.js interface is in `frontend/`; the Phase 1 engine and contracts remain intact. Start the complete application with the existing Compose command, then register the demo without running an experiment:
+
+```sh
+docker compose up --build -d
+docker compose exec api python scripts/seed.py --register-only
+```
+
+Open http://localhost:3000. The Command Center uses real project-wide counts, React Flow uses registered dependencies, and Experiment Studio submits confirmed backend runs. Investigator and Evidence Explorer display persisted findings/snapshots. Replay distinguishes recorded instructions from unavailable automatic replay. AI, minimization and repair are explicitly unavailable until Phase 3.
+
+For local development without Docker, `python scripts/dev_stack.py` starts the real API, demo, Redis and Celery with SQLite. Run the frontend separately with Node 24 LTS and `npm ci && npm run dev` after configuring its server-only environment. See [frontend setup, exact routes and tests](frontend/README.md), [Phase 2 plan](docs/PHASE2_PLAN.md), and the Phase 2 delivery report for actual verification limits. The Docker/PostgreSQL path remains the authoritative deployment check.

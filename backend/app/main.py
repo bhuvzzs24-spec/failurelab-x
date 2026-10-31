@@ -18,6 +18,8 @@ configure(); instrument(app)
 from app.core.limits import BodyLimit
 app.add_middleware(BodyLimit)
 app.include_router(router,dependencies=[Depends(auth)])
+from app.api.overview import router as overview_router
+app.include_router(overview_router,dependencies=[Depends(auth)])
 @app.exception_handler(HTTPException)
 async def http_error(request,exc):
     return JSONResponse(status_code=exc.status_code,content={"error":{"code":str(exc.status_code),"message":str(exc.detail)}})

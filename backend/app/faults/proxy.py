@@ -123,7 +123,7 @@ async def send(writer,status,body):
     await writer.drain()
 
 async def main():
-    server=await asyncio.start_server(handle,"0.0.0.0",int(os.getenv("DATA_PORT","8000")),limit=8192)
-    config=uvicorn.Config(app,host="0.0.0.0",port=int(os.getenv("CONTROL_PORT","8001")),log_config=None)
+    server=await asyncio.start_server(handle,os.getenv("BIND_HOST","0.0.0.0"),int(os.getenv("DATA_PORT","8000")),limit=8192)
+    config=uvicorn.Config(app,host=os.getenv("BIND_HOST","0.0.0.0"),port=int(os.getenv("CONTROL_PORT","8001")),log_config=None)
     async with server: await uvicorn.Server(config).serve()
 if __name__ == "__main__": asyncio.run(main())

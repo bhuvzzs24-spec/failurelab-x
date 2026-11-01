@@ -17,12 +17,12 @@ No arbitrary repository program repair, automatic merge or deployment is claimed
 
 ## Actual checks
 
-* Backend: **57 passed, 1 skipped** in 71.26 seconds on the final algorithm code.
+* Backend: **58 passed, 1 skipped** in 72.61 seconds on the final algorithm code.
   The skip is generated-candidate execution inside Docker because `docker` is absent.
   Includes SQLite Alembic upgrade/check/downgrade, real HTTP defects/fixed controls,
   true two-fault reduction, missing evidence handling, cancellation/timeouts/fencing,
   real Redis/Celery worker kill/restart recovery, persistence, agent command isolation,
-  model proposal validation and regression detection.
+  model proposal validation, regression detection, and clean-checkout module origins.
 * Frontend: **48 unit/component/API tests passed**; ESLint, strict TypeScript and
   production build passed. Browser results: **4 Chrome scenarios passed** (55.5s),
   including the complete discovery/reduction/investigation/patch/availability flow,
@@ -43,7 +43,9 @@ publication; the check-to-write ownership race is covered by a regression test.
 Earlier checks exposed and fixed an invalid `max_hits=0` minimizer candidate, a
 research test's Redis teardown order, and ambiguous verification outcome display.
 A development-server cold-loading stall was resolved in the reproducible browser
-check by serving the successful production build. No failing tests were disabled.
+check by serving the successful production build. A final packaging check caught the independent verifier module missing from the
+initial commit; it is included in the follow-up fix with an import-origin regression
+test. No failing tests were disabled.
 
 ## Equal-budget benchmark
 

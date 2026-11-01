@@ -243,7 +243,9 @@ services:
       timeout: 5s
       retries: 10
   frontend:
-    build: ./frontend
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
     image: failurelab-x-frontend:${BUILD_VERSION:-phase4-local}
     init: true
     restart: unless-stopped

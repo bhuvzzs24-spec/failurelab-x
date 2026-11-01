@@ -1,12 +1,14 @@
 FROM node:24-alpine AS dependencies
 WORKDIR /app
-COPY package.json package-lock.json ./
+COPY frontend/package.json frontend/package-lock.json ./
 RUN npm ci
 
 FROM node:24-alpine AS build
 WORKDIR /app
 COPY --from=dependencies /app/node_modules ./node_modules
-COPY . .
+COPY frontend/ .
+# Contract validation remains typechecked in Docker; its shared spec is outside frontend.
+COPY docs/openapi.json /docs/openapi.json
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 

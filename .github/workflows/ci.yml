@@ -74,4 +74,4 @@ jobs:
       - run: docker build -t failurelab-api-ci .
       - run: docker build -f infrastructure/Dockerfile.verifier -t failurelab-verifier-ci .
       - run: docker build -f infrastructure/Dockerfile.agent -t failurelab-agent-ci .
-      - run: docker build -t failurelab-ui-ci frontend
+      - run: docker build -f frontend/Dockerfile -t failurelab-ui-ci .

@@ -46,3 +46,6 @@ def ready():
         return {"status":"ready","database":True,"broker":True}
     except Exception:
         raise HTTPException(503,"database migration or broker unavailable")
+
+from app.api.research import router as research_router
+app.include_router(research_router,dependencies=[Depends(auth)])

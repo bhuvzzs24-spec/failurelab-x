@@ -54,3 +54,6 @@ credentials/
 /evidence/
 # Next.js regenerates this for development/build-specific route types.
 frontend/next-env.d.ts
+
+# Preserve local sync-conflict environment files without publishing them.
+.env *.example

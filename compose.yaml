@@ -42,6 +42,10 @@ services:
     depends_on: {postgres: {condition: service_healthy}}
   api:
     <<: *app
+    environment:
+      <<: *env
+      REPAIR_AGENT_URL: ${REPAIR_AGENT_URL:-}
+      OLLAMA_URL: ${OLLAMA_URL:-}
     ports: ['127.0.0.1:8000:8000']
     depends_on: {migrate: {condition: service_completed_successfully}, redis: {condition: service_healthy}}
     healthcheck:
@@ -54,12 +58,17 @@ services:
     environment:
       <<: *env
       CONTROL_TOKEN: ${CONTROL_TOKEN:-local-control-token}
+      OLLAMA_URL: ${OLLAMA_URL:-}
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-qwen3:8b}
+      REPAIR_AGENT_URL: ${REPAIR_AGENT_URL:-}
+      REPAIR_AGENT_TOKEN: ${REPAIR_AGENT_TOKEN:-}
     command: [celery, -A, app.workers.tasks.celery, worker, --loglevel=INFO, --concurrency=2]
     depends_on:
       migrate: {condition: service_completed_successfully}
       redis: {condition: service_healthy}
       gateway: {condition: service_healthy}
       fault-proxy: {condition: service_healthy}
+      bench-gateway: {condition: service_healthy}
   scheduler:
     <<: *app
     command: [celery, -A, app.workers.tasks.celery, beat, --loglevel=INFO, --schedule=/tmp/celerybeat]
@@ -111,6 +120,62 @@ services:
       inventory: {condition: service_healthy}
       fault-proxy: {condition: service_healthy}
     healthcheck: *demo-health
+  bench-order:
+    <<: *app
+    command: [uvicorn, app.benchmarks.runtime:create_app, --factory, --host, 0.0.0.0, --port, '8100', --no-access-log]
+    environment:
+      BENCH_ROLE: order
+      BENCH_DATABASE_URL: postgresql+psycopg://demo:${DEMO_POSTGRES_PASSWORD:-local-demo-password}@demo-postgres:5432/demo
+      CONTROL_TOKEN: ${CONTROL_TOKEN:-local-control-token}
+      BUILD_VERSION: ${BUILD_VERSION:-phase3-local}
+    depends_on: {demo-postgres: {condition: service_healthy}}
+    healthcheck:
+      test: [CMD, python, -c, 'import os,urllib.request; urllib.request.urlopen(urllib.request.Request("http://localhost:8100/health",headers={"X-Control-Token":os.getenv("CONTROL_TOKEN","local-control-token")}))']
+      interval: 3s
+      timeout: 2s
+      retries: 30
+  bench-payment:
+    <<: *app
+    command: [uvicorn, app.benchmarks.runtime:create_app, --factory, --host, 0.0.0.0, --port, '8100', --no-access-log]
+    environment:
+      BENCH_ROLE: payment
+      BENCH_DATABASE_URL: postgresql+psycopg://demo:${DEMO_POSTGRES_PASSWORD:-local-demo-password}@demo-postgres:5432/demo
+      CONTROL_TOKEN: ${CONTROL_TOKEN:-local-control-token}
+      BUILD_VERSION: ${BUILD_VERSION:-phase3-local}
+    depends_on: {demo-postgres: {condition: service_healthy}}
+    healthcheck:
+      test: [CMD, python, -c, 'import os,urllib.request; urllib.request.urlopen(urllib.request.Request("http://localhost:8100/health",headers={"X-Control-Token":os.getenv("CONTROL_TOKEN","local-control-token")}))']
+      interval: 3s
+      timeout: 2s
+      retries: 30
+  bench-inventory:
+    <<: *app
+    command: [uvicorn, app.benchmarks.runtime:create_app, --factory, --host, 0.0.0.0, --port, '8100', --no-access-log]
+    environment:
+      BENCH_ROLE: inventory
+      BENCH_DATABASE_URL: postgresql+psycopg://demo:${DEMO_POSTGRES_PASSWORD:-local-demo-password}@demo-postgres:5432/demo
+      CONTROL_TOKEN: ${CONTROL_TOKEN:-local-control-token}
+      BUILD_VERSION: ${BUILD_VERSION:-phase3-local}
+    depends_on: {demo-postgres: {condition: service_healthy}}
+    healthcheck:
+      test: [CMD, python, -c, 'import os,urllib.request; urllib.request.urlopen(urllib.request.Request("http://localhost:8100/health",headers={"X-Control-Token":os.getenv("CONTROL_TOKEN","local-control-token")}))']
+      interval: 3s
+      timeout: 2s
+      retries: 30
+  bench-gateway:
+    <<: *app
+    command: [uvicorn, app.benchmarks.runtime:create_app, --factory, --host, 0.0.0.0, --port, '8100', --no-access-log]
+    environment:
+      BENCH_ROLE: gateway
+      BENCH_DATABASE_URL: postgresql+psycopg://demo:${DEMO_POSTGRES_PASSWORD:-local-demo-password}@demo-postgres:5432/demo
+      CONTROL_TOKEN: ${CONTROL_TOKEN:-local-control-token}
+      BUILD_VERSION: ${BUILD_VERSION:-phase3-local}
+    depends_on: {demo-postgres: {condition: service_healthy}}
+    healthcheck:
+      test: [CMD, python, -c, 'import os,urllib.request; urllib.request.urlopen(urllib.request.Request("http://localhost:8100/health",headers={"X-Control-Token":os.getenv("CONTROL_TOKEN","local-control-token")}))']
+      interval: 3s
+      timeout: 2s
+      retries: 30
   frontend:
     build: ./frontend
     image: failurelab-x-frontend:${BUILD_VERSION:-phase2-local}

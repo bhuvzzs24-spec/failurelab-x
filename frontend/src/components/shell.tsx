@@ -34,9 +34,12 @@ export const navigation = [
   { href: "/findings", label: "Failure investigator", icon: Search },
   { href: "/evidence", label: "Evidence explorer", icon: Box },
   { href: "/replay", label: "Failure replay", icon: Workflow },
-  { href: "/ai", label: "AI investigator", icon: Sparkles, group: "INTELLIGENCE", future: true },
-  { href: "/minimization", label: "Minimal sequence", icon: Activity, future: true },
-  { href: "/verification", label: "Fix verification lab", icon: ShieldCheck, future: true },
+  { href: "/explorer", label: "Adaptive explorer", icon: FlaskConical, group: "RESEARCH" },
+  { href: "/ai", label: "AI investigator", icon: Sparkles, group: "INTELLIGENCE" },
+  { href: "/minimization", label: "Minimal sequence", icon: Activity },
+  { href: "/verification", label: "Fix verification lab", icon: ShieldCheck },
+  { href: "/patches", label: "Patch review", icon: GitBranch },
+  { href: "/benchmarks", label: "Benchmarks", icon: Activity },
   { href: "/settings", label: "Settings", icon: Settings2, group: "CONFIGURATION" },
 ];
 export function Shell({ children }: { children: React.ReactNode }) {
@@ -106,7 +109,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
           <ChevronLeft className="workspace-chevron" size={14} />
         </button>
         <nav>
-          {navigation.map(({ href, label, icon: Icon, group, future }) => (
+          {navigation.map(({ href, label, icon: Icon, group }) => (
             <div key={href}>
               {group && <span className="nav-group">{group}</span>}
               <Link
@@ -118,7 +121,6 @@ export function Shell({ children }: { children: React.ReactNode }) {
               >
                 <Icon size={17} />
                 <span>{label}</span>
-                {future && <span className="phase-tag">P3</span>}
               </Link>
             </div>
           ))}
@@ -226,7 +228,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
         <footer className="app-footer">
           <span>
             <SquareTerminal size={12} /> FAILURELAB X{" "}
-            <span className="footer-version">PHASE 2</span>
+            <span className="footer-version">PHASE 3</span>
           </span>
           <span>
             Evidence over assumptions <span className="footer-separator">·</span> Local execution

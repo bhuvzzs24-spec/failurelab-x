@@ -383,10 +383,232 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/research/capabilities": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Capabilities */
+        get: operations["capabilities_api_v1_research_capabilities_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/research/projects/{project_id}/jobs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Jobs */
+        get: operations["jobs_api_v1_research_projects__project_id__jobs_get"];
+        put?: never;
+        /** Create */
+        post: operations["create_api_v1_research_projects__project_id__jobs_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/research/jobs/{job_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Job */
+        get: operations["job_api_v1_research_jobs__job_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/research/jobs/{job_id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Cancel */
+        post: operations["cancel_api_v1_research_jobs__job_id__cancel_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/research/projects/{project_id}/trials": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Trials */
+        get: operations["trials_api_v1_research_projects__project_id__trials_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/research/trials/{trial_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Trial */
+        get: operations["trial_api_v1_research_trials__trial_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/research/projects/{project_id}/findings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Findings */
+        get: operations["findings_api_v1_research_projects__project_id__findings_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/research/jobs/{job_id}/decisions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Decisions */
+        get: operations["decisions_api_v1_research_jobs__job_id__decisions_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/research/jobs/{job_id}/artifacts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Artifacts */
+        get: operations["artifacts_api_v1_research_jobs__job_id__artifacts_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/research/projects/{project_id}/candidates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Candidates */
+        get: operations["candidates_api_v1_research_projects__project_id__candidates_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/research/candidates/{candidate_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Candidate */
+        get: operations["candidate_api_v1_research_candidates__candidate_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** Action */
+        Action: {
+            /**
+             * Boundary
+             * @enum {string}
+             */
+            boundary: "charge" | "reserve" | "finalize" | "refund";
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "latency" | "http_503" | "timeout";
+            /**
+             * Phase
+             * @default after
+             * @enum {string}
+             */
+            phase: "before" | "after";
+            /**
+             * Delay Ms
+             * @default 180
+             */
+            delay_ms: number;
+            /**
+             * At Ms
+             * @default 0
+             */
+            at_ms: number;
+            /**
+             * Max Hits
+             * @default 1
+             */
+            max_hits: number;
+        };
         /** ActivityPoint */
         ActivityPoint: {
             /** Day */
@@ -408,6 +630,25 @@ export interface components {
             sha256: string;
             /** Payload */
             payload: {
+                [key: string]: unknown;
+            };
+        };
+        /** CandidateOut */
+        CandidateOut: {
+            /** Id */
+            id: string;
+            /** Project Id */
+            project_id: string;
+            /** Source Trial Id */
+            source_trial_id: string;
+            /** Created At */
+            created_at: number;
+            /** Status */
+            status: string;
+            /** Patch */
+            patch: string;
+            /** Metadata */
+            metadata: {
                 [key: string]: unknown;
             };
         };
@@ -453,6 +694,26 @@ export interface components {
              */
             op: "eq" | "ne" | "gte" | "lte";
             right: components["schemas"]["Operand"];
+        };
+        /** DecisionOut */
+        DecisionOut: {
+            /** Id */
+            id: string;
+            /** Job Id */
+            job_id: string;
+            /** Step */
+            step: number;
+            /** Context */
+            context: {
+                [key: string]: unknown;
+            };
+            scenario: components["schemas"]["Scenario"];
+            /** Score */
+            score: number;
+            /** Reward */
+            reward: number;
+            /** Cost Seconds */
+            cost_seconds: number;
         };
         /** DependencyCreate */
         DependencyCreate: {
@@ -667,6 +928,28 @@ export interface components {
             /** Total */
             total: number;
         };
+        /** Page[CandidateOut] */
+        Page_CandidateOut_: {
+            /** Items */
+            items: components["schemas"]["CandidateOut"][];
+            /** Offset */
+            offset: number;
+            /** Limit */
+            limit: number;
+            /** Total */
+            total: number;
+        };
+        /** Page[DecisionOut] */
+        Page_DecisionOut_: {
+            /** Items */
+            items: components["schemas"]["DecisionOut"][];
+            /** Offset */
+            offset: number;
+            /** Limit */
+            limit: number;
+            /** Total */
+            total: number;
+        };
         /** Page[ExperimentOut] */
         Page_ExperimentOut_: {
             /** Items */
@@ -711,6 +994,39 @@ export interface components {
             /** Total */
             total: number;
         };
+        /** Page[ResearchArtifactOut] */
+        Page_ResearchArtifactOut_: {
+            /** Items */
+            items: components["schemas"]["ResearchArtifactOut"][];
+            /** Offset */
+            offset: number;
+            /** Limit */
+            limit: number;
+            /** Total */
+            total: number;
+        };
+        /** Page[ResearchFindingOut] */
+        Page_ResearchFindingOut_: {
+            /** Items */
+            items: components["schemas"]["ResearchFindingOut"][];
+            /** Offset */
+            offset: number;
+            /** Limit */
+            limit: number;
+            /** Total */
+            total: number;
+        };
+        /** Page[ResearchJobOut] */
+        Page_ResearchJobOut_: {
+            /** Items */
+            items: components["schemas"]["ResearchJobOut"][];
+            /** Offset */
+            offset: number;
+            /** Limit */
+            limit: number;
+            /** Total */
+            total: number;
+        };
         /** Page[RunOut] */
         Page_RunOut_: {
             /** Items */
@@ -726,6 +1042,17 @@ export interface components {
         Page_ServiceOut_: {
             /** Items */
             items: components["schemas"]["ServiceOut"][];
+            /** Offset */
+            offset: number;
+            /** Limit */
+            limit: number;
+            /** Total */
+            total: number;
+        };
+        /** Page[TrialOut] */
+        Page_TrialOut_: {
+            /** Items */
+            items: components["schemas"]["TrialOut"][];
             /** Offset */
             offset: number;
             /** Limit */
@@ -772,6 +1099,94 @@ export interface components {
             /** Latest Findings */
             latest_findings: components["schemas"]["FindingOut"][];
         };
+        /** ResearchArtifactOut */
+        ResearchArtifactOut: {
+            /** Id */
+            id: string;
+            /** Job Id */
+            job_id: string;
+            /** Kind */
+            kind: string;
+            /** Created At */
+            created_at: number;
+            /** Sha256 */
+            sha256: string;
+            /** Payload */
+            payload: {
+                [key: string]: unknown;
+            };
+        };
+        /** ResearchCreate */
+        ResearchCreate: {
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "SEARCH" | "MINIMIZE" | "INVESTIGATE" | "REPAIR" | "VERIFY" | "BENCHMARK";
+            /** Idempotency Key */
+            idempotency_key: string;
+            search?: components["schemas"]["SearchInput"];
+            /** Source Trial Id */
+            source_trial_id?: string | null;
+            /** Candidate Id */
+            candidate_id?: string | null;
+            /**
+             * Budget
+             * @default 20
+             */
+            budget: number;
+            /**
+             * Repeats
+             * @default 2
+             */
+            repeats: number;
+            /** Seeds */
+            seeds?: number[];
+        };
+        /** ResearchFindingOut */
+        ResearchFindingOut: {
+            /** Id */
+            id: string;
+            /** Project Id */
+            project_id: string;
+            /** Signature */
+            signature: string;
+            /** First Trial Id */
+            first_trial_id: string;
+            /** Occurrences */
+            occurrences: number;
+            /** Summary */
+            summary: string;
+        };
+        /** ResearchJobOut */
+        ResearchJobOut: {
+            /** Id */
+            id: string;
+            /** Project Id */
+            project_id: string;
+            /** Kind */
+            kind: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "CREATED" | "QUEUED" | "RUNNING" | "COMPLETED" | "FAILED" | "CANCELLED";
+            /** Created At */
+            created_at: number;
+            /** Updated At */
+            updated_at: number;
+            /** Deadline */
+            deadline: number;
+            input: components["schemas"]["ResearchCreate"];
+            /** Result */
+            result: {
+                [key: string]: unknown;
+            };
+            /** Error */
+            error: string | null;
+            /** Cancel Requested */
+            cancel_requested: boolean;
+        };
         /** RunCreate */
         RunCreate: {
             /** Idempotency Key */
@@ -814,6 +1229,57 @@ export interface components {
             findings: components["schemas"]["FindingOut"][];
             /** Artifacts */
             artifacts: components["schemas"]["ArtifactOut"][];
+        };
+        /** Scenario */
+        Scenario: {
+            /**
+             * Defect
+             * @enum {string}
+             */
+            defect: "payment_ack_loss" | "unsafe_retry" | "lost_finalization" | "inventory_drift" | "concurrent_retry" | "failed_compensation";
+            /** Actions */
+            actions?: components["schemas"]["Action"][];
+            /**
+             * Amount
+             * @default 100
+             */
+            amount: number;
+            /**
+             * Quantity
+             * @default 1
+             */
+            quantity: number;
+            /**
+             * Concurrency
+             * @default 1
+             */
+            concurrency: number;
+            /**
+             * Consistency Ms
+             * @default 100
+             */
+            consistency_ms: number;
+        };
+        /** SearchInput */
+        SearchInput: {
+            /**
+             * Strategy
+             * @default adaptive
+             * @enum {string}
+             */
+            strategy: "random" | "coverage" | "adaptive";
+            /**
+             * Budget
+             * @default 12
+             */
+            budget: number;
+            /**
+             * Seed
+             * @default 42
+             */
+            seed: number;
+            /** Defects */
+            defects?: ("payment_ack_loss" | "unsafe_retry" | "lost_finalization" | "inventory_drift" | "concurrent_retry" | "failed_compensation")[];
         };
         /** ServiceCreate */
         ServiceCreate: {
@@ -866,6 +1332,36 @@ export interface components {
                 string,
                 string
             ][];
+        };
+        /** TrialOut */
+        TrialOut: {
+            /** Id */
+            id: string;
+            /** Job Id */
+            job_id: string;
+            /** Project Id */
+            project_id: string;
+            /** Created At */
+            created_at: number;
+            scenario: components["schemas"]["Scenario"];
+            /**
+             * Variant
+             * @enum {string}
+             */
+            variant: "original" | "reference";
+            /**
+             * Classification
+             * @enum {string}
+             */
+            classification: "APPLICATION_VIOLATION" | "NO_VIOLATION" | "INCONCLUSIVE" | "INFRASTRUCTURE_ERROR" | "INJECTION_NOT_OBSERVED";
+            /** Signature */
+            signature: string | null;
+            /** Cost Seconds */
+            cost_seconds: number;
+            /** Evidence */
+            evidence: {
+                [key: string]: unknown;
+            };
         };
     };
     responses: never;
@@ -2496,6 +2992,746 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    capabilities_api_v1_research_capabilities_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    jobs_api_v1_research_projects__project_id__jobs_get: {
+        parameters: {
+            query?: {
+                offset?: number;
+                limit?: number;
+            };
+            header?: {
+                authorization?: string;
+            };
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_ResearchJobOut_"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    create_api_v1_research_projects__project_id__jobs_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string;
+            };
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResearchCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResearchJobOut"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    job_api_v1_research_jobs__job_id__get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string;
+            };
+            path: {
+                job_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResearchJobOut"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    cancel_api_v1_research_jobs__job_id__cancel_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string;
+            };
+            path: {
+                job_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResearchJobOut"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    trials_api_v1_research_projects__project_id__trials_get: {
+        parameters: {
+            query?: {
+                offset?: number;
+                limit?: number;
+            };
+            header?: {
+                authorization?: string;
+            };
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_TrialOut_"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    trial_api_v1_research_trials__trial_id__get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string;
+            };
+            path: {
+                trial_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TrialOut"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    findings_api_v1_research_projects__project_id__findings_get: {
+        parameters: {
+            query?: {
+                offset?: number;
+                limit?: number;
+            };
+            header?: {
+                authorization?: string;
+            };
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_ResearchFindingOut_"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    decisions_api_v1_research_jobs__job_id__decisions_get: {
+        parameters: {
+            query?: {
+                offset?: number;
+                limit?: number;
+            };
+            header?: {
+                authorization?: string;
+            };
+            path: {
+                job_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_DecisionOut_"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    artifacts_api_v1_research_jobs__job_id__artifacts_get: {
+        parameters: {
+            query?: {
+                offset?: number;
+                limit?: number;
+            };
+            header?: {
+                authorization?: string;
+            };
+            path: {
+                job_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_ResearchArtifactOut_"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    candidates_api_v1_research_projects__project_id__candidates_get: {
+        parameters: {
+            query?: {
+                offset?: number;
+                limit?: number;
+            };
+            header?: {
+                authorization?: string;
+            };
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_CandidateOut_"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Content */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    candidate_api_v1_research_candidates__candidate_id__get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string;
+            };
+            path: {
+                candidate_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CandidateOut"];
                 };
             };
             /** @description Unauthorized */

@@ -2,6 +2,18 @@ import { redact } from "@/lib/redact";
 
 const id = "[a-zA-Z0-9_-]+";
 const allowed: { pattern: RegExp; methods: string[] }[] = [
+  { pattern: /^api\/v1\/research\/capabilities$/, methods: ["GET"] },
+  { pattern: new RegExp(`^api/v1/research/projects/${id}/jobs$`), methods: ["GET", "POST"] },
+  {
+    pattern: new RegExp(`^api/v1/research/projects/${id}/(trials|findings|candidates)$`),
+    methods: ["GET"],
+  },
+  {
+    pattern: new RegExp(`^api/v1/research/jobs/${id}(/(decisions|artifacts))?$`),
+    methods: ["GET"],
+  },
+  { pattern: new RegExp(`^api/v1/research/jobs/${id}/cancel$`), methods: ["POST"] },
+  { pattern: new RegExp(`^api/v1/research/(trials|candidates)/${id}$`), methods: ["GET"] },
   { pattern: /^(health|ready)$/, methods: ["GET"] },
   { pattern: /^api\/v1\/capabilities$/, methods: ["GET"] },
   { pattern: /^api\/v1\/projects$/, methods: ["GET", "POST"] },

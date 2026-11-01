@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Dashboard } from "./dashboard";
 import { EvidenceExplorer } from "./evidence-explorer";
 import { ExperimentStudio } from "./experiment-studio";
-import { FutureWorkspace } from "./future-workspaces";
+import { ResearchWorkspace } from "./research-workspace";
 import { Investigator } from "./investigator";
 import { useProject } from "./providers";
 import { Replay } from "./replay";
@@ -14,6 +14,21 @@ import { SystemGraph } from "./system-graph";
 import { Button } from "./ui/button";
 import { ErrorState, Loading, NoProject, Panel } from "./ui/states";
 const titles: Record<Section, { eyebrow: string; title: string; description: string }> = {
+  explorer: {
+    eyebrow: "ADAPTIVE DISCOVERY",
+    title: "Experiment explorer",
+    description: "Allocate a bounded budget across faults, timing and service boundaries.",
+  },
+  patches: {
+    eyebrow: "ISOLATED REPAIR",
+    title: "Patch review",
+    description: "Inspect proposed source changes and independent verification evidence.",
+  },
+  benchmarks: {
+    eyebrow: "MEASURE, DO NOT ASSUME",
+    title: "Benchmark dashboard",
+    description: "Compare discovery strategies under equal budgets and repeated seeds.",
+  },
   home: {
     eyebrow: "YOUR SYSTEM, UNDER A MICROSCOPE",
     title: "Command center",
@@ -47,17 +62,17 @@ const titles: Record<Section, { eyebrow: string; title: string; description: str
   ai: {
     eyebrow: "PHASE 3 WORKSPACE",
     title: "AI investigator",
-    description: "A prepared workspace for causal reasoning grounded in execution evidence.",
+    description: "Test competing hypotheses with paired controlled interventions.",
   },
   minimization: {
     eyebrow: "PHASE 3 WORKSPACE",
     title: "Minimal failure sequence",
-    description: "Compare recorded events with future verified reduction results.",
+    description: "Reduce observed failures through repeated, signature-preserving trials.",
   },
   verification: {
     eyebrow: "PHASE 3 WORKSPACE",
     title: "Fix verification lab",
-    description: "Prepare to test a repair against the failure it claims to resolve.",
+    description: "Compare original and candidate versions in the restricted verification sandbox.",
   },
   settings: {
     eyebrow: "WORKSPACE CONFIGURATION",
@@ -103,7 +118,7 @@ export function Workspace({ section }: { section: Section }) {
         content = <Settings />;
         break;
       default:
-        content = <FutureWorkspace section={section} />;
+        content = <ResearchWorkspace key={`${projectId}-${section}`} section={section} />;
     }
   return (
     <>

@@ -3008,3 +3008,136 @@ kbd {
     visibility: visible;
   }
 }
+
+/* Phase 3 research workspaces share the existing application surfaces. */
+.research-controls {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+.research-controls label {
+  display: grid;
+  gap: 0.5rem;
+  flex: 1 1 170px;
+  font-size: 0.78rem;
+  color: var(--text-muted, #b8bfd6);
+}
+.research-controls select,
+.research-controls input {
+  width: 100%;
+  min-height: 40px;
+  padding: 0.6rem;
+  border: 1px solid #343b57;
+  border-radius: 8px;
+  background: #12182b;
+  color: #edf0ff;
+}
+.research-comparison {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+.research-comparison > * {
+  min-width: 0;
+}
+.research-graph {
+  height: 350px;
+  border: 1px solid #343b57;
+  border-radius: 12px;
+  margin: 1rem 0;
+  overflow: hidden;
+}
+.research-chart {
+  width: 100%;
+  min-width: 0;
+  margin: 1rem 0;
+}
+.research-hypotheses {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin: 1rem 0;
+}
+.research-hypotheses article {
+  padding: 1rem;
+  background: #141a2c;
+  border: 1px solid #303854;
+  border-radius: 10px;
+}
+.research-hypotheses p {
+  font-size: 0.8rem;
+  color: #bac2d9;
+  line-height: 1.6;
+}
+.patch-diff {
+  overflow: auto;
+  max-height: 500px;
+  border: 1px solid #343b57;
+  border-radius: 10px;
+  padding: 1rem;
+  font-size: 0.78rem;
+  line-height: 1.8;
+  background: #0d1222;
+}
+.patch-diff span {
+  display: block;
+  white-space: pre;
+}
+.patch-diff .addition {
+  background: #10352e;
+  color: #88eed0;
+}
+.patch-diff .deletion {
+  background: #371e2b;
+  color: #ffafc1;
+}
+.research-workspace details {
+  margin-top: 1rem;
+  min-width: 0;
+}
+.research-workspace summary {
+  cursor: pointer;
+  padding: 0.5rem 0;
+  color: #c5c9ef;
+  font-size: 0.82rem;
+}
+.research-workspace .json-view {
+  max-height: 480px;
+}
+@media (max-width: 760px) {
+  .research-comparison {
+    grid-template-columns: 1fr;
+  }
+  .research-controls {
+    align-items: stretch;
+  }
+  .research-graph {
+    height: 300px;
+  }
+}
+
+.verification-outcome {
+  padding: 1rem;
+  margin: 1rem 0;
+  border: 1px solid #79623f;
+  border-radius: 10px;
+  background: #2c261c;
+  color: #f9d58c;
+}
+.verification-outcome p {
+  font-size: 0.8rem;
+  line-height: 1.6;
+  margin-top: 0.5rem;
+}
+.verification-outcome[data-outcome="PATCH_PASSES_TESTED_SCENARIOS"] {
+  border-color: #26785d;
+  background: #142b25;
+  color: #a0efcc;
+}
+.verification-outcome[data-outcome="PATCH_FAILS_VERIFICATION"] {
+  border-color: #8e4857;
+  background: #321c24;
+  color: #ffb7c4;
+}

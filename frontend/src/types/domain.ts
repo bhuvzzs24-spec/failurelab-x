@@ -23,4 +23,7 @@ export type Section =
   | "ai"
   | "minimization"
   | "verification"
+  | "explorer"
+  | "patches"
+  | "benchmarks"
   | "settings";

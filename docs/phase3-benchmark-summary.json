@@ -1,0 +1,409 @@
+{
+  "benchmark_job_id": "f480d31b-bbbe-4c32-bdc1-e0383193f10c",
+  "configuration": {
+    "kind": "BENCHMARK",
+    "idempotency_key": "delivery-benchmark-v7",
+    "search": {
+      "strategy": "adaptive",
+      "budget": 6,
+      "seed": 42,
+      "defects": [
+        "payment_ack_loss",
+        "unsafe_retry",
+        "lost_finalization",
+        "inventory_drift",
+        "concurrent_retry",
+        "failed_compensation"
+      ]
+    },
+    "source_trial_id": null,
+    "candidate_id": null,
+    "budget": 20,
+    "repeats": 2,
+    "seeds": [
+      17,
+      42,
+      93
+    ]
+  },
+  "result": {
+    "comparisons": [
+      {
+        "strategy": "random",
+        "seed": 17,
+        "budget": 6,
+        "executed": 6,
+        "unique_bugs": 3,
+        "unique_violation_signatures": 3,
+        "experiments_until_first_finding": 2,
+        "execution_cost_seconds": 4.771826333002537,
+        "classification_counts": {
+          "APPLICATION_VIOLATION": 3,
+          "INJECTION_NOT_OBSERVED": 1,
+          "NO_VIOLATION": 2
+        },
+        "trial_ids": [
+          "ea57e822-c05d-4dc9-bd5b-0e61188e9715",
+          "629d7bf2-3433-4682-881a-e4d31e65f67f",
+          "16939e73-90dd-4121-b803-fe295f96f0e2",
+          "d42c1aec-5cd8-48bd-8dec-e1c5e18e59b4",
+          "bed0d562-a02a-4003-85a9-1ea3030e89aa",
+          "7b7bb9b5-bab4-4797-bfe7-f4752cea9ca0"
+        ],
+        "false_positive_findings": null,
+        "false_positive_note": "Requires independent oracle adjudication; not inferred from invariant failures."
+      },
+      {
+        "strategy": "coverage",
+        "seed": 17,
+        "budget": 6,
+        "executed": 6,
+        "unique_bugs": 3,
+        "unique_violation_signatures": 3,
+        "experiments_until_first_finding": 1,
+        "execution_cost_seconds": 4.719172875004006,
+        "classification_counts": {
+          "APPLICATION_VIOLATION": 3,
+          "INJECTION_NOT_OBSERVED": 1,
+          "NO_VIOLATION": 2
+        },
+        "trial_ids": [
+          "2641a439-3e29-41c1-9909-a9fa8a4f02a7",
+          "10b06898-372c-493f-b47b-f22cb9cb2551",
+          "f0a96e65-1be0-4d0d-b95a-ca86213da3fd",
+          "46742305-8376-4731-ab7e-e68cc1911a79",
+          "63a535da-455f-4016-8f5e-4451832bb567",
+          "be6b49ae-fb00-44a8-bcd0-9bd051572bab"
+        ],
+        "false_positive_findings": null,
+        "false_positive_note": "Requires independent oracle adjudication; not inferred from invariant failures."
+      },
+      {
+        "strategy": "adaptive",
+        "seed": 17,
+        "budget": 6,
+        "executed": 6,
+        "unique_bugs": 2,
+        "unique_violation_signatures": 2,
+        "experiments_until_first_finding": 1,
+        "execution_cost_seconds": 4.661007123999298,
+        "classification_counts": {
+          "APPLICATION_VIOLATION": 3,
+          "NO_VIOLATION": 3
+        },
+        "trial_ids": [
+          "f6626f31-81a5-4d28-8e57-46697e576ee4",
+          "5686f0a6-a7fd-4dba-873b-e682e08745f9",
+          "4f6207bd-8f45-45f2-b3ca-aea5ebdb670e",
+          "fc3c396a-001b-4517-b55b-51f439bef6d6",
+          "04cbdb9c-7e03-4bf6-8543-5d6a669ad8b5",
+          "242f54f8-ae60-424f-811f-c73ba858c8a0"
+        ],
+        "false_positive_findings": null,
+        "false_positive_note": "Requires independent oracle adjudication; not inferred from invariant failures."
+      },
+      {
+        "strategy": "random",
+        "seed": 42,
+        "budget": 6,
+        "executed": 6,
+        "unique_bugs": 2,
+        "unique_violation_signatures": 2,
+        "experiments_until_first_finding": 1,
+        "execution_cost_seconds": 3.163265835006314,
+        "classification_counts": {
+          "APPLICATION_VIOLATION": 2,
+          "NO_VIOLATION": 4
+        },
+        "trial_ids": [
+          "79d321de-ffd5-4207-bb2a-59c731d9d476",
+          "09d796e6-ab88-48b3-ab0e-0fedaf490566",
+          "b9e3294d-cbfa-489d-9af0-e44db04b2e3c",
+          "1c55db30-6c54-488a-ba59-094264d5e58f",
+          "184d4b2f-60a4-4707-94df-811ae67b8343",
+          "0fdd34ad-20c5-4ab6-9c60-a0a0bbf04863"
+        ],
+        "false_positive_findings": null,
+        "false_positive_note": "Requires independent oracle adjudication; not inferred from invariant failures."
+      },
+      {
+        "strategy": "coverage",
+        "seed": 42,
+        "budget": 6,
+        "executed": 6,
+        "unique_bugs": 1,
+        "unique_violation_signatures": 1,
+        "experiments_until_first_finding": 4,
+        "execution_cost_seconds": 4.649713833001442,
+        "classification_counts": {
+          "APPLICATION_VIOLATION": 1,
+          "INJECTION_NOT_OBSERVED": 2,
+          "NO_VIOLATION": 3
+        },
+        "trial_ids": [
+          "eccdd8a8-19da-4ad3-9fb4-025ae6b612d5",
+          "6c9437ec-a0a9-4f40-8a38-0e2f4a372df9",
+          "aac79d59-1d51-4021-8050-df64e03cbfbe",
+          "da25ccbf-e8f6-45b0-97a2-f8c1c29d926a",
+          "3d4a47c3-350c-46ab-8fb8-8f0a79ce4b5e",
+          "c0955b03-1477-4183-ba45-3b4f03927d93"
+        ],
+        "false_positive_findings": null,
+        "false_positive_note": "Requires independent oracle adjudication; not inferred from invariant failures."
+      },
+      {
+        "strategy": "adaptive",
+        "seed": 42,
+        "budget": 6,
+        "executed": 6,
+        "unique_bugs": 2,
+        "unique_violation_signatures": 2,
+        "experiments_until_first_finding": 1,
+        "execution_cost_seconds": 4.656929958007822,
+        "classification_counts": {
+          "APPLICATION_VIOLATION": 3,
+          "NO_VIOLATION": 3
+        },
+        "trial_ids": [
+          "dc3e5a36-6112-42d1-95de-d338927a914a",
+          "a9c636fb-7419-40c8-9988-225a55391dd6",
+          "4a2ce1b7-ab87-47ec-aed9-1adadd1317db",
+          "9298ceff-3bfd-4574-bf99-76c4f822d0fd",
+          "b7bce1fd-2ad0-4e70-96c0-dfc649a96b51",
+          "ae996f8b-b235-49a4-800b-a6ef13f8b069"
+        ],
+        "false_positive_findings": null,
+        "false_positive_note": "Requires independent oracle adjudication; not inferred from invariant failures."
+      },
+      {
+        "strategy": "random",
+        "seed": 93,
+        "budget": 6,
+        "executed": 6,
+        "unique_bugs": 2,
+        "unique_violation_signatures": 2,
+        "experiments_until_first_finding": 2,
+        "execution_cost_seconds": 4.677263375997427,
+        "classification_counts": {
+          "APPLICATION_VIOLATION": 3,
+          "INJECTION_NOT_OBSERVED": 1,
+          "NO_VIOLATION": 2
+        },
+        "trial_ids": [
+          "2400d41f-aff4-4a6e-bfbf-4bcb99a963f6",
+          "9a88a9b0-9676-48bd-b7ae-69a1773210fc",
+          "036f9bbc-5a6c-4480-a6b5-12de46a696d8",
+          "df759757-2170-4254-88be-f6b351acc0cf",
+          "b89d49b6-aa84-4ebe-bb8c-0610f5a10088",
+          "1d9e7408-f30a-479a-a6cd-18a50f0e920b"
+        ],
+        "false_positive_findings": null,
+        "false_positive_note": "Requires independent oracle adjudication; not inferred from invariant failures."
+      },
+      {
+        "strategy": "coverage",
+        "seed": 93,
+        "budget": 6,
+        "executed": 6,
+        "unique_bugs": 4,
+        "unique_violation_signatures": 4,
+        "experiments_until_first_finding": 1,
+        "execution_cost_seconds": 4.608577790982963,
+        "classification_counts": {
+          "APPLICATION_VIOLATION": 4,
+          "INJECTION_NOT_OBSERVED": 2
+        },
+        "trial_ids": [
+          "8cffaf8e-3896-490c-9f2c-0e92430252c4",
+          "b3d3e89c-f787-451a-b9e4-06ea897729ef",
+          "99c32135-157a-486e-a82c-82a9f94437c2",
+          "a6d9ddd2-7321-4295-91e6-16e5a5931541",
+          "713b67b5-52fd-4a86-a144-b0226bffb58a",
+          "50260678-3057-446f-b277-3779983087be"
+        ],
+        "false_positive_findings": null,
+        "false_positive_note": "Requires independent oracle adjudication; not inferred from invariant failures."
+      },
+      {
+        "strategy": "adaptive",
+        "seed": 93,
+        "budget": 6,
+        "executed": 6,
+        "unique_bugs": 2,
+        "unique_violation_signatures": 2,
+        "experiments_until_first_finding": 1,
+        "execution_cost_seconds": 5.280955083020672,
+        "classification_counts": {
+          "APPLICATION_VIOLATION": 2,
+          "INJECTION_NOT_OBSERVED": 1,
+          "NO_VIOLATION": 3
+        },
+        "trial_ids": [
+          "ba84ad41-af6b-429c-9ce6-c769e31101c2",
+          "3566cf90-c5a3-404f-88f3-2ecfe4fe284f",
+          "8a228d97-f32a-4629-bcac-5f7dcef5010a",
+          "f38ef25d-6c20-4e1f-be17-4c302e0d050b",
+          "0bce70e5-4d4f-4735-8032-4004fafd9bce",
+          "9ec9e76e-339d-4ebe-ad80-fe8cd72232e1"
+        ],
+        "false_positive_findings": null,
+        "false_positive_note": "Requires independent oracle adjudication; not inferred from invariant failures."
+      }
+    ],
+    "mean_unique_bugs": {
+      "random": 2.3333333333333335,
+      "coverage": 2.6666666666666665,
+      "adaptive": 2.0
+    },
+    "adaptive_improved_observed_mean": false,
+    "reference_comparisons": [
+      {
+        "defect": "payment_ack_loss",
+        "original_trial_id": "2253980f-52a1-44c4-a078-b2c8417bf931",
+        "reference_trial_id": "15627de0-f0d9-43a1-a4f1-37f0cc3dd768",
+        "original": "APPLICATION_VIOLATION",
+        "reference": "NO_VIOLATION",
+        "repeat_trial_id": "5e63e688-c9bb-489e-97da-88b3e9ae151b",
+        "repeat_matches_signature": true,
+        "baseline_trial_id": "bb54d954-aad4-412b-a748-ba61d3d81827",
+        "baseline": "NO_VIOLATION",
+        "reference_wall_delta_seconds": 0.029308167002454866
+      },
+      {
+        "defect": "unsafe_retry",
+        "original_trial_id": "8610d6da-fe15-467a-89ba-fdf3cd5a6936",
+        "reference_trial_id": "5ffcc7c6-312c-45a2-a538-f2b03a271849",
+        "original": "APPLICATION_VIOLATION",
+        "reference": "NO_VIOLATION",
+        "repeat_trial_id": "43fa7e23-9843-464c-88d9-964b91c56113",
+        "repeat_matches_signature": true,
+        "baseline_trial_id": "a1c0a1ca-3a98-4de3-81cb-01a3813b4513",
+        "baseline": "NO_VIOLATION",
+        "reference_wall_delta_seconds": 0.0069126659946050495
+      },
+      {
+        "defect": "lost_finalization",
+        "original_trial_id": "30c91dd7-40eb-4d4f-a8de-fa6b9dff69e0",
+        "reference_trial_id": "c0f7530d-b8cf-4aab-9851-e2ec06a1a29c",
+        "original": "APPLICATION_VIOLATION",
+        "reference": "NO_VIOLATION",
+        "repeat_trial_id": "07be10a0-54c8-422f-afc2-92d79e3a3aea",
+        "repeat_matches_signature": true,
+        "baseline_trial_id": "be237af6-f381-42d3-a14a-5dcdaddaa98a",
+        "baseline": "NO_VIOLATION",
+        "reference_wall_delta_seconds": 0.012212916008138563
+      },
+      {
+        "defect": "inventory_drift",
+        "original_trial_id": "10fa1eb2-10f0-40e2-959a-c3064508be42",
+        "reference_trial_id": "57d01871-f5c8-4e28-931b-77cbe8bc03b5",
+        "original": "APPLICATION_VIOLATION",
+        "reference": "NO_VIOLATION",
+        "repeat_trial_id": "9bb42e5f-5aed-4a10-a2f9-984db507e8ed",
+        "repeat_matches_signature": true,
+        "baseline_trial_id": "73d9d77b-3276-4a8b-8e57-4b7c32ecff19",
+        "baseline": "NO_VIOLATION",
+        "reference_wall_delta_seconds": 0.004581250010232907
+      },
+      {
+        "defect": "concurrent_retry",
+        "original_trial_id": "277684b1-60b9-4791-89ef-4c9dcf8a31d0",
+        "reference_trial_id": "f9c52c1b-174c-41b5-8188-9b511e1af890",
+        "original": "APPLICATION_VIOLATION",
+        "reference": "NO_VIOLATION",
+        "repeat_trial_id": "2b6ad4bb-6eca-42ec-af30-4652778710f1",
+        "repeat_matches_signature": true,
+        "baseline_trial_id": "ce82e23e-a58f-4b37-b790-81131ffeb9c2",
+        "baseline": "NO_VIOLATION",
+        "reference_wall_delta_seconds": 0.0038059590006014332
+      },
+      {
+        "defect": "failed_compensation",
+        "original_trial_id": "dd62b7dc-6618-4a67-9204-c0dd37b28a4e",
+        "reference_trial_id": "f2b1af34-a8bc-4b69-ba31-9fe645a0af02",
+        "original": "APPLICATION_VIOLATION",
+        "reference": "NO_VIOLATION",
+        "repeat_trial_id": "b6a3e179-88c5-49b1-8966-3871e823b6c8",
+        "repeat_matches_signature": true,
+        "baseline_trial_id": "91019020-34b0-4414-a123-b42313e25a2c",
+        "baseline": "NO_VIOLATION",
+        "reference_wall_delta_seconds": 0.012750165995385032
+      }
+    ],
+    "reference_comparison_note": "Trusted shipped reference policies; not execution or verification of generated candidate patches.",
+    "witness_reproduction_matches": 6,
+    "witness_pairs": 6,
+    "unexpected_control_violations": 0,
+    "candidate_repair_verification_success": null,
+    "candidate_repair_verification_note": "Reported by independent VERIFY jobs; reference policies are not generated candidate verification.",
+    "seeds": [
+      17,
+      42,
+      93
+    ],
+    "budget_per_strategy_per_seed": 6,
+    "limitations": [
+      "Small finite candidate space; no generalization claim.",
+      "False positives require external adjudication; not reported as zero.",
+      "Wall costs reflect this execution environment."
+    ]
+  },
+  "service_versions": {
+    "gateway": {
+      "role": "gateway",
+      "version": "phase3-local-source",
+      "policy_sha256": "67961b7da179a2a3d75a492e1835e11b244f5976536e27e62b2b5188694159d1",
+      "runtime_sha256": "6d094783c033f47217e3b2ded8168f643ed2ea404eef1fcf45b7a66994a39360",
+      "python": "3.13.15"
+    },
+    "order": {
+      "role": "order",
+      "version": "phase3-local-source",
+      "policy_sha256": "67961b7da179a2a3d75a492e1835e11b244f5976536e27e62b2b5188694159d1",
+      "runtime_sha256": "6d094783c033f47217e3b2ded8168f643ed2ea404eef1fcf45b7a66994a39360",
+      "python": "3.13.15"
+    },
+    "payment": {
+      "role": "payment",
+      "version": "phase3-local-source",
+      "policy_sha256": "67961b7da179a2a3d75a492e1835e11b244f5976536e27e62b2b5188694159d1",
+      "runtime_sha256": "6d094783c033f47217e3b2ded8168f643ed2ea404eef1fcf45b7a66994a39360",
+      "python": "3.13.15"
+    },
+    "inventory": {
+      "role": "inventory",
+      "version": "phase3-local-source",
+      "policy_sha256": "67961b7da179a2a3d75a492e1835e11b244f5976536e27e62b2b5188694159d1",
+      "runtime_sha256": "6d094783c033f47217e3b2ded8168f643ed2ea404eef1fcf45b7a66994a39360",
+      "python": "3.13.15"
+    }
+  },
+  "pipeline_summary": {
+    "SEARCH": {
+      "id": "e82cb582-0b0c-461f-a6d0-cc5b160d211f",
+      "status": "COMPLETED",
+      "outcome": null
+    },
+    "MINIMIZE": {
+      "id": "f558c453-d2f4-4e63-b70e-02f41b2671fc",
+      "status": "COMPLETED",
+      "outcome": null
+    },
+    "INVESTIGATE": {
+      "id": "f52a6296-aa3f-4cf9-ac8a-cea731c62d74",
+      "status": "COMPLETED",
+      "outcome": null
+    },
+    "REPAIR": {
+      "id": "87ab7087-0435-4972-9d7b-739dcebfd093",
+      "status": "COMPLETED",
+      "outcome": null
+    },
+    "VERIFY": {
+      "id": "c8107df1-87f0-429f-8b90-671255466408",
+      "status": "COMPLETED",
+      "outcome": "INFRASTRUCTURE_ERROR"
+    }
+  },
+  "measurement_scope": "Local macOS, Python 3.13.15, real HTTP processes, SQLite, Redis/Celery; generated candidate not executed because Docker agent unavailable."
+}

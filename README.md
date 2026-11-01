@@ -1,12 +1,12 @@
-# FailureLab X — Phase 1
+# FailureLab X — Phase 3
 
-A runnable local failure experimentation backend with executable cross-service invariants. The demo uses fake payments only. No frontend, AI planner, scanning, shell execution API, or production targets.
+A local distributed-systems correctness lab with executable invariants, a connected Next.js interface, adaptive discovery, counterexample reduction, causal interventions, and constrained repair verification. The demo uses fake payments only; all execution is limited to managed sandboxes. See [the Phase 3 workflow and limitations](docs/PHASE3.md).
 
 The discovery scenario loses the acknowledgement of a committed payment. The coordinator times out and leaves an order pending; authoritative state proves the inconsistency even though all four services remain healthy.
 
 ## Launch
 
-Requires Docker Engine with Compose v2. Python containers use Python 3.12. Only the platform API is published, on loopback.
+Requires Docker Engine with Compose v2. Python containers use Python 3.12. The API and frontend are published only on loopback.
 
 ```sh
 cp .env.example .env
@@ -102,6 +102,13 @@ docker compose up --build -d
 docker compose exec api python scripts/seed.py --register-only
 ```
 
-Open http://localhost:3000. The Command Center uses real project-wide counts, React Flow uses registered dependencies, and Experiment Studio submits confirmed backend runs. Investigator and Evidence Explorer display persisted findings/snapshots. Replay distinguishes recorded instructions from unavailable automatic replay. AI, minimization and repair are explicitly unavailable until Phase 3.
+Open http://localhost:3000. The Command Center uses real project-wide counts, React Flow uses registered dependencies, and Experiment Studio submits confirmed backend runs. Investigator and Evidence Explorer display persisted findings/snapshots. Replay distinguishes recorded instructions from unavailable automatic replay. Phase 3 connects the research workspaces to durable backend jobs; generated candidate execution additionally requires the restricted Docker agent.
 
 For local development without Docker, `python scripts/dev_stack.py` starts the real API, demo, Redis and Celery with SQLite. Run the frontend separately with Node 24 LTS and `npm ci && npm run dev` after configuring its server-only environment. See [frontend setup, exact routes and tests](frontend/README.md), [Phase 2 plan](docs/PHASE2_PLAN.md), and the Phase 2 delivery report for actual verification limits. The Docker/PostgreSQL path remains the authoritative deployment check.
+
+Phase 3 adds bounded adaptive discovery, repeated counterexample reduction,
+paired causal interventions, constrained policy repair, independent container
+verification, six HTTP benchmark defects and six connected research workspaces.
+See [Phase 3 architecture, safety, API and exact workflow commands](docs/PHASE3.md).
+Candidate verification requires the separately operated restricted Docker agent;
+without it the result is an explicit infrastructure error, never a successful repair.

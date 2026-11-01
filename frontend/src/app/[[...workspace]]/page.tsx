@@ -13,6 +13,9 @@ const sections: Section[] = [
   "ai",
   "minimization",
   "verification",
+  "explorer",
+  "patches",
+  "benchmarks",
   "settings",
 ];
 export default async function Page({ params }: { params: Promise<{ workspace?: string[] }> }) {

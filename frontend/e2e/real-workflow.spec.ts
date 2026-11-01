@@ -64,17 +64,13 @@ test("real registered demo → graph → controlled experiment → finding → e
   await page.screenshot({ path: "test-results/command-center.png", fullPage: true });
 });
 
-test("responsive navigation, command palette and accessible unavailable states", async ({
-  page,
-}) => {
+test("responsive navigation, command palette and accessible research states", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
   await page.getByRole("button", { name: "Open navigation", exact: true }).click();
   await page.getByRole("link", { name: /AI investigator/ }).click();
   await expect(page.getByRole("heading", { name: "AI investigator.", exact: true })).toBeVisible();
-  await expect(
-    page.getByRole("button", { name: "Engine not connected", exact: true }),
-  ).toBeDisabled();
+  await expect(page.getByRole("button", { name: "Test hypotheses", exact: true })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(
     true,
   );
@@ -90,7 +86,9 @@ test("responsive navigation, command palette and accessible unavailable states",
   expect(accessibility.violations).toEqual([]);
 });
 
-test("all ten workspaces render their real or accurately unavailable state", async ({ page }) => {
+test("all thirteen workspaces render their real or accurately unavailable state", async ({
+  page,
+}) => {
   for (const [path, title] of [
     ["/", "Command center."],
     ["/graph", "System graph."],
@@ -101,6 +99,9 @@ test("all ten workspaces render their real or accurately unavailable state", asy
     ["/ai", "AI investigator."],
     ["/minimization", "Minimal failure sequence."],
     ["/verification", "Fix verification lab."],
+    ["/explorer", "Experiment explorer."],
+    ["/patches", "Patch review."],
+    ["/benchmarks", "Benchmark dashboard."],
     ["/settings", "Settings & projects."],
   ]) {
     await page.goto(path);

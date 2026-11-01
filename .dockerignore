@@ -6,3 +6,8 @@ work
 **/__pycache__
 outputs
 frontend
+.env*
+*.pem
+*.key
+.secrets
+credentials

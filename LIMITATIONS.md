@@ -11,3 +11,5 @@
 * Base image tags are mutable; constraints are not hash-locked releases/SBOMs. Dependency audit and secret scans reflect their execution time and known advisory data only. Development-only generator advisories are documented in the results.
 * The repair agent holds Docker daemon access and must be isolated on a trusted disposable VM. Shared hosted CI only builds images; it must not execute faults or patches.
 * No public deployment, hosting account provisioning, DNS/TLS issuance, repo visibility change or production-readiness certification was performed.
+
+Remote Linux CI subsequently passed Python 3.12/PostgreSQL 16 migrations, Redis security checks and all four image builds ([CI supplement](docs/PHASE4_CI_RESULTS.md)). This closes build/migration checks, not Mac Compose startup, isolated fault execution or generated-candidate verification.

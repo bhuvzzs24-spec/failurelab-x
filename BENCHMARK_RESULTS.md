@@ -37,7 +37,7 @@ Two earlier acceptance attempts expired during large host-time pauses: one bench
 | Complete backend pytest | 74 passed, 1 skipped, 0 failed (71.98 s) |
 | Skipped test | Generated-candidate Docker container integration; Docker unavailable |
 | SQLite migrations | Upgrade → metadata drift check → downgrade → re-upgrade passed, including audit schema |
-| PostgreSQL migrations | Offline SQL compiled through 0003; actual PostgreSQL execution unavailable |
+| PostgreSQL migrations | Offline SQL compiled locally; actual PostgreSQL 16 migration round-trip passed in Linux CI |
 | Safe shared-CI selection (local) | 29 module tests + 9 selected research tests passed; subset of full suite |
 | Frontend lint / TypeScript | Passed |
 | Vitest / React Testing Library | 57 passed across 6 files |
@@ -48,7 +48,7 @@ Two earlier acceptance attempts expired during large host-time pauses: one bench
 | Frontend production dependency audit | 0 known vulnerabilities |
 | Frontend full dependency audit | 3 moderate, 0 high, 0 critical; development-only generator chain |
 | Secret scan | 0 candidates before staging; final staged result recorded in delivery report |
-| Docker/Compose builds and host topology | Not executed: Docker CLI/daemon unavailable |
+| Docker/Compose builds and host topology | Mac runtime not executed; all four image builds and Compose config passed in Linux CI |
 
 The safe-CI selection was rerun after adding the final operations test. PostgreSQL service and Python 3.12 checks are configured in GitHub Actions, not inferred from local SQLite/Python 3.13 results. Browser verification covers the actual unavailable-agent report, not a passing candidate. Its accessibility scan covers the exercised evidence workspace and responsive navigation, not certification of every UI state.
 
@@ -68,3 +68,5 @@ caffeinate -is python scripts/acceptance.py --benchmark --budget 12
 ```
 
 Each run uses fresh transaction namespaces and idempotency keys; small-sample scheduling outcomes/costs can change. Never overwrite recorded reports to imply exact replay. Docker-capable isolated execution and a disposable PostgreSQL database remain required release gates.
+
+Post-push verification: the [corrected Safe CI run](https://github.com/bhuvzzs24-spec/failurelab-x/actions/runs/41306738900) passed all four jobs on runtime revision bd76773. See [the CI supplement](docs/PHASE4_CI_RESULTS.md) for the initial build failure, correction and precise remote validation boundary.

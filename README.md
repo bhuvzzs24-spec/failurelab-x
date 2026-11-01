@@ -42,3 +42,5 @@ python scripts/browser_acceptance.py  # running native/Compose app + Google Chro
 Node 24+, Redis and Python 3.12+ are needed for native tests; generated-patch verification needs Docker and the fixed verifier image. Tests explicitly skip unavailable Docker. PostgreSQL migration validation requires a dedicated `TEST_POSTGRES_URL`; SQLite does not establish PostgreSQL compatibility. Full fault/patch tests belong only on isolated machines.
 
 [ARCHITECTURE.md](ARCHITECTURE.md) describes components and API boundaries. [BENCHMARK_RESULTS.md](BENCHMARK_RESULTS.md) records actual measurements. [SECURITY.md](SECURITY.md), [DEPLOYMENT.md](DEPLOYMENT.md) and [LIMITATIONS.md](LIMITATIONS.md) define deployment gates. No public deployment or production-readiness claim is made. Earlier phase reports remain under `docs/`.
+
+Linux CI separately passed actual PostgreSQL migrations, Redis checks and all four container builds; see [verified CI results](docs/PHASE4_CI_RESULTS.md). Mac Compose execution and generated-candidate verification remain pending an isolated Docker host.

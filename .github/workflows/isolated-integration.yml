@@ -1,0 +1,24 @@
+name: Approved isolated integration
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  lab:
+    if: github.ref == 'refs/heads/main'
+    # Configure required reviewers and a single-use, network-isolated runner first.
+    environment: isolated-lab
+    runs-on: [self-hosted, linux, x64, failurelab-isolated, ephemeral]
+    timeout-minutes: 30
+    env:
+      APP_MODE: local
+      API_TOKEN: local-development-token
+      CONTROL_TOKEN: local-control-token
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with: {persist-credentials: false}
+      - run: python3 -m venv .venv
+      - run: .venv/bin/python -m pip install -c constraints.txt '.[test]'
+      - run: docker build -f infrastructure/Dockerfile.verifier -t failurelab-verifier:phase3 .
+      - run: .venv/bin/python -m pytest -q
+      # This runner must contain no production credentials and be destroyed after use.

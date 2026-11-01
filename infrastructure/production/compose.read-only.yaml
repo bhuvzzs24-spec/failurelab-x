@@ -1,0 +1,29 @@
+# Deployment preparation only. Use an approved, sanitized snapshot database.
+# Do not point this service at a private execution database or queue.
+services:
+  readonly-api:
+    image: ${FAILURELAB_API_IMAGE:?set an audited immutable image digest}
+    init: true
+    user: '10001:10001'
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    cpus: 1
+    mem_limit: 512m
+    pids_limit: 64
+    restart: unless-stopped
+    command: [uvicorn, app.main:app, --host, 0.0.0.0, --port, '8000', --no-access-log]
+    environment:
+      APP_MODE: read_only
+      AUTH_VIEWER_TOKEN: ${AUTH_VIEWER_TOKEN:?set a distinct random viewer token}
+      DATABASE_URL: ${READONLY_DATABASE_URL:?set a TLS read-only snapshot database URI}
+      REDIS_URL: ${RATE_REDIS_URL:?set a dedicated TLS rate-limit Redis URI}
+      BUILD_VERSION: ${BUILD_VERSION:?set the source revision}
+    # Bind only to the ingress host. TLS/OIDC/WAF belong at the approved ingress.
+    ports: ['127.0.0.1:8080:8000']
+    healthcheck:
+      test: [CMD, python, -c, 'import urllib.request; urllib.request.urlopen("http://localhost:8000/ready")']
+      interval: 10s
+      timeout: 3s
+      retries: 5

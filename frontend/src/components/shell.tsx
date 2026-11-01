@@ -1,4 +1,5 @@
 "use client";
+import { AccessNotice, useAccess } from "./access";
 import { request } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
@@ -43,6 +44,7 @@ export const navigation = [
   { href: "/settings", label: "Settings", icon: Settings2, group: "CONFIGURATION" },
 ];
 export function Shell({ children }: { children: React.ReactNode }) {
+  const access = useAccess();
   const path = usePathname();
   const router = useRouter();
   const [collapsed, setCollapsed] = useState(false);
@@ -217,18 +219,25 @@ export function Shell({ children }: { children: React.ReactNode }) {
             >
               <Command size={16} />
             </Button>
-            <span className="operator-avatar" title="Local operator">
-              OP
+            <span className="operator-avatar" title={`Access role: ${access.role}`}>
+              {access.role === "admin"
+                ? "AD"
+                : access.role === "operator"
+                  ? "OP"
+                  : access.role === "viewer"
+                    ? "RO"
+                    : "—"}
             </span>
           </div>
         </header>
         <main id="main-content" tabIndex={-1}>
+          <AccessNotice />
           {children}
         </main>
         <footer className="app-footer">
           <span>
             <SquareTerminal size={12} /> FAILURELAB X{" "}
-            <span className="footer-version">PHASE 3</span>
+            <span className="footer-version">PHASE 4</span>
           </span>
           <span>
             Evidence over assumptions <span className="footer-separator">·</span> Local execution

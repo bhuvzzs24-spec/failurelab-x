@@ -15,6 +15,9 @@ def cluster(folder,extra_env=None,package_root=None):
     folder=Path(folder); folder.mkdir(parents=True,exist_ok=True)
     urls={role:'http://127.0.0.1:'+str(port()) for role in ('gateway','order','payment','inventory')}
     env=os.environ.copy(); env.update(extra_env or {}); env.update({'BENCH_'+r.upper()+'_URL':u for r,u in urls.items()})
+    # Resolve children from this imported package, not a stale editable install.
+    if package_root is None:
+        env['PYTHONPATH']=str(Path(__file__).resolve().parents[2])
     env['CONTROL_TOKEN']='isolated-benchmark-control'
     processes=[]; handles=[]
     try:
@@ -29,7 +32,7 @@ def cluster(folder,extra_env=None,package_root=None):
                     with httpx.Client(trust_env=False,timeout=.2) as client:
                         if client.get(url+'/health',headers={'X-Control-Token':env['CONTROL_TOKEN']}).status_code==200: break
                 except httpx.HTTPError: pass
-                if time.monotonic()>deadline: raise RuntimeError('benchmark '+role+' startup failed: '+(folder/(role+'.log')).read_text()[-1500:])
+                if processes[-1].poll() is not None or time.monotonic()>deadline: raise RuntimeError('benchmark '+role+' startup failed: '+(folder/(role+'.log')).read_text()[-1500:])
                 time.sleep(.05)
         yield urls,env['CONTROL_TOKEN']
     finally:

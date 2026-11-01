@@ -28,6 +28,8 @@ async def auth(x_control_token: str = Header(default="")):
     if not hmac.compare_digest(x_control_token,settings().control_token): raise HTTPException(401,"invalid control token")
 
 app = FastAPI(title="FailureLab restricted fault control")
+from app.core.limits import BodyLimit
+app.add_middleware(BodyLimit)
 from app.telemetry.logging import configure, instrument
 configure(); instrument(app)
 @app.get("/health")

@@ -11,7 +11,7 @@ def test_upgrade_downgrade(tmp_path):
     def migrate(*args): subprocess.run([sys.executable,"-m","alembic",*args],cwd=root,env=env,check=True,capture_output=True)
     migrate("upgrade","head")
     engine=create_engine(url)
-    assert {"runs","artifacts","findings","sandbox_leases"}<=set(inspect(engine).get_table_names())
+    assert {"runs","artifacts","findings","sandbox_leases","research_jobs","research_trials","repair_candidates","audit_events"}<=set(inspect(engine).get_table_names())
     migrate("check")
     engine.dispose()
     migrate("downgrade","base")

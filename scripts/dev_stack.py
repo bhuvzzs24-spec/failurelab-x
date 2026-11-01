@@ -29,7 +29,7 @@ def main():
     env["CELERY_QUEUE"]="failurelab-local-"+str(args.redis_port)
     env.setdefault("API_TOKEN","local-development-token")
     env.setdefault("CONTROL_TOKEN","local-control-token")
-    env["BUILD_VERSION"]="phase3-local-source"
+    env["BUILD_VERSION"]="phase4-local-source"
     names=("gateway","order","payment","inventory","proxy","proxy_control")
     ports={name:args.base_port+index for index,name in enumerate(names)}
     for name,port in ports.items(): env[name.upper()+"_URL"]=f"http://127.0.0.1:{port}"
@@ -49,7 +49,7 @@ def main():
                 try:
                     if client.get(url,headers=headers).is_success: return
                 except httpx.HTTPError: pass
-                if process.poll() is not None: raise RuntimeError("A service exited; inspect work/local-stack logs")
+                if process.poll() is not None: raise RuntimeError(f"A service exited; inspect {folder}")
                 time.sleep(.1)
         raise TimeoutError("Service did not become ready: "+url)
     def stop(signum,frame): raise KeyboardInterrupt()
@@ -81,7 +81,7 @@ def main():
         spawn("worker",[sys.executable,"-m","celery","-A","app.workers.tasks.celery","worker","--pool=solo","--loglevel=INFO","--without-gossip","--without-mingle"])
         spawn("scheduler",[sys.executable,"-m","celery","-A","app.workers.tasks.celery","beat","--loglevel=INFO","--schedule",str(folder/"celerybeat")])
         subprocess.run([sys.executable,"scripts/seed.py","--url",api_origin,"--register-only"],cwd=ROOT,env=env,check=True)
-        print(f"Local stack ready at {api_origin}. Real SQLite state, fake payments, local targets. Logs: work/local-stack/",flush=True)
+        print(f"Local stack ready at {api_origin}. Real SQLite state, fake payments, local targets. Logs: {folder}",flush=True)
         print("Development worker uses solo pool; Linux prefork hard time limits must be checked with Compose.",flush=True)
         while True:
             for name,process in processes:

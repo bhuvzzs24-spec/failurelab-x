@@ -11,7 +11,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body>
-        <Providers>
+        <Providers readOnly={process.env.ACCESS_MODE === "read_only"}>
           <Shell>{children}</Shell>
         </Providers>
       </body>

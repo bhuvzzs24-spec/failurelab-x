@@ -154,7 +154,7 @@ export function Settings() {
                 </small>
               )}
             </label>
-            <Button disabled={create.isPending} type="submit">
+            <Button control="manage" disabled={create.isPending} type="submit">
               <Plus size={14} />
               {create.isPending ? "Creating…" : "Create project"}
             </Button>
@@ -290,7 +290,9 @@ export function Settings() {
                     {error.message}
                   </p>
                 ))}
-                <Button disabled={service.isPending}>Register service</Button>
+                <Button control="manage" disabled={service.isPending}>
+                  Register service
+                </Button>
               </form>
             </details>
           </Panel>
@@ -382,6 +384,7 @@ export function Settings() {
                 </div>
                 <Button
                   variant="secondary"
+                  control="manage"
                   disabled={edge.isPending || dependency.source_id === dependency.target_id}
                 >
                   Register dependency
@@ -453,7 +456,7 @@ export function Settings() {
                       {ruleError}
                     </p>
                   )}
-                  <Button disabled={invariant.isPending} variant="secondary">
+                  <Button control="manage" disabled={invariant.isPending} variant="secondary">
                     Register invariant
                   </Button>
                 </form>

@@ -3141,3 +3141,41 @@ kbd {
   background: #321c24;
   color: #ffb7c4;
 }
+
+.access-banner {
+  position: relative;
+  padding: 0.65rem 1rem;
+  background: #292435;
+  border-bottom: 1px solid #5d547a;
+  color: #e4d7ff;
+  text-align: center;
+  font-size: 0.8rem;
+  z-index: 20;
+}
+
+.research-summary {
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  color: #bdc6e0;
+  font-size: 0.8rem;
+}
+.research-summary strong {
+  color: #e9e4ff;
+  font-size: 1.25rem;
+  margin-right: 0.4rem;
+}
+.research-summary a {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  color: #ac9aff;
+}
+
+/* Keep research records aligned with the original investigation surfaces. */
+.research-workspace { display: grid; gap: 1.25rem; min-width: 0; }
+.research-workspace .panel { padding: 0 1.25rem 1.25rem; }
+.research-workspace .panel-heading { padding-inline: 0; }
+.research-workspace .microcopy { padding-inline: 0; }

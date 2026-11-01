@@ -83,6 +83,7 @@ export function RunMonitor({ runId }: { runId: string }) {
             variant="destructive"
             size="sm"
             disabled={!!run.cancel_requested || cancel.isPending}
+            control="execute"
             onClick={() => setConfirm(true)}
           >
             <Square size={12} />

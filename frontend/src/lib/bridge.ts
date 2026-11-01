@@ -9,12 +9,13 @@ const allowed: { pattern: RegExp; methods: string[] }[] = [
     methods: ["GET"],
   },
   {
-    pattern: new RegExp(`^api/v1/research/jobs/${id}(/(decisions|artifacts))?$`),
+    pattern: new RegExp(`^api/v1/research/jobs/${id}(/(decisions|artifacts|trials))?$`),
     methods: ["GET"],
   },
   { pattern: new RegExp(`^api/v1/research/jobs/${id}/cancel$`), methods: ["POST"] },
   { pattern: new RegExp(`^api/v1/research/(trials|candidates)/${id}$`), methods: ["GET"] },
   { pattern: /^(health|ready)$/, methods: ["GET"] },
+  { pattern: /^api\/v1\/session$/, methods: ["GET"] },
   { pattern: /^api\/v1\/capabilities$/, methods: ["GET"] },
   { pattern: /^api\/v1\/projects$/, methods: ["GET", "POST"] },
   { pattern: new RegExp(`^api/v1/projects/${id}$`), methods: ["GET"] },
@@ -64,8 +65,28 @@ export async function bridge(
   } catch {
     return error(400, "Invalid request host");
   }
-  if (!["127.0.0.1", "localhost", "[::1]"].includes(browserOrigin.hostname))
-    return error(403, "Local frontend host required");
+  const readOnly = env.ACCESS_MODE === "read_only";
+  const local = ["127.0.0.1", "localhost", "[::1]"].includes(browserOrigin.hostname);
+  if (!local) {
+    try {
+      const configured = new URL(env.PUBLIC_FRONTEND_ORIGIN ?? "");
+      if (
+        !readOnly ||
+        configured.protocol !== "https:" ||
+        configured.username ||
+        configured.password ||
+        configured.pathname !== "/" ||
+        configured.search ||
+        configured.hash ||
+        configured.host !== browserOrigin.host
+      )
+        throw new Error();
+    } catch {
+      return error(403, "Only the configured read-only public frontend host is allowed");
+    }
+  }
+  if (readOnly && request.method !== "GET")
+    return error(403, "Read-only demonstration: mutations are disabled");
   if (request.method !== "GET" && request.headers.get("origin") !== browserOrigin.origin)
     return error(403, "Same-origin request required");
   const token = env.API_TOKEN;
@@ -73,9 +94,13 @@ export async function bridge(
   let upstream: URL;
   try {
     upstream = new URL(env.BACKEND_URL ?? "http://127.0.0.1:8000");
+    const localUpstream =
+      upstream.protocol === "http:" &&
+      ["127.0.0.1", "localhost", "[::1]", "api"].includes(upstream.hostname);
+    const hostedUpstream =
+      readOnly && upstream.protocol === "https:" && env.HOSTED_BACKEND_ORIGIN === upstream.origin;
     if (
-      upstream.protocol !== "http:" ||
-      !["127.0.0.1", "localhost", "[::1]", "api"].includes(upstream.hostname) ||
+      (!localUpstream && !hostedUpstream) ||
       upstream.username ||
       upstream.password ||
       upstream.search ||
@@ -146,9 +171,14 @@ export async function bridge(
         response.status,
         path === "ready" ? "Backend dependencies are not ready" : "Backend request failed",
       );
+    const headers: Record<string, string> = { "Cache-Control": "no-store" };
+    const retry = response.headers.get("retry-after");
+    const requestId = response.headers.get("x-request-id");
+    if (retry && /^\d{1,6}$/.test(retry)) headers["Retry-After"] = retry;
+    if (requestId && /^[a-f0-9-]{36}$/.test(requestId)) headers["X-Request-ID"] = requestId;
     return Response.json(redact(payload), {
       status: response.status,
-      headers: { "Cache-Control": "no-store" },
+      headers,
     });
   } catch {
     return error(

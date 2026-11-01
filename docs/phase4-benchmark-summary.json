@@ -1,0 +1,1331 @@
+{
+  "benchmark_job_id": "7640d88d-32c1-40c4-a281-7ffae11b7f97",
+  "measured_on": "2026-11-01",
+  "host": "macOS native, SQLite, real Redis/Celery, Python 3.13.15",
+  "protocol": {
+    "id": "failurelab-synthetic-v2",
+    "training_sha256": "9989018041c4fb633049ac0fcbd3f596092770e5c441c909584cf0094c2c6dce",
+    "held_out_sha256": "2b3287745a972c1a1ac35653c5dbb7176604aa6a60926e1c422d272b48cfb1aa",
+    "held_out_scope": "unseen inputs and latency parameters; same seeded program families",
+    "no_history": true,
+    "alpha": 1.4,
+    "seeded_synthetic_defects": true,
+    "novel_discoveries_claimed": false,
+    "implementation_hashes": {
+      "planning/search.py": "0ea21d0f4a3abf89a1603a3bd29b5a2776d12a296c03885a0caa6e62c8fb13df",
+      "benchmarks/catalog.py": "4d5a15dbf89a3a969b2812b845a5af2262b0c3bfb0edc698e6742274825c2c86",
+      "benchmarks/study.py": "b24e4e1bb24ec07e2c66bc0379bb81a8da72db03194aa345e78a42c389ba3bca",
+      "benchmarks/runtime.py": "d5e10c872bf15bf41751614bbf5d1d89821740521c6d9ab4c9229344d60b0aef",
+      "invariants/engine.py": "eac1447e432b83a9c44406a4d43327549c037869d1f50943e455ec74f3a0b1e6"
+    }
+  },
+  "cohort_order": [
+    {
+      "seed": 17,
+      "strategy": "random"
+    },
+    {
+      "seed": 17,
+      "strategy": "coverage"
+    },
+    {
+      "seed": 17,
+      "strategy": "adaptive"
+    },
+    {
+      "seed": 42,
+      "strategy": "coverage"
+    },
+    {
+      "seed": 42,
+      "strategy": "adaptive"
+    },
+    {
+      "seed": 42,
+      "strategy": "random"
+    },
+    {
+      "seed": 93,
+      "strategy": "adaptive"
+    },
+    {
+      "seed": 93,
+      "strategy": "random"
+    },
+    {
+      "seed": 93,
+      "strategy": "coverage"
+    }
+  ],
+  "comparisons": [
+    {
+      "strategy": "random",
+      "seed": 17,
+      "budget": 12,
+      "executed": 12,
+      "unique_bugs": 4,
+      "unique_violation_signatures": 4,
+      "experiments_until_first_finding": 2,
+      "execution_cost_seconds": 9.493268457998056,
+      "classification_counts": {
+        "APPLICATION_VIOLATION": 4,
+        "INJECTION_NOT_OBSERVED": 3,
+        "NO_VIOLATION": 5
+      },
+      "trial_ids": [
+        "7b09f800-42d2-4011-a5f7-64e3533e924a",
+        "9f3d5da5-88fe-40a1-87af-e8ea8a779106",
+        "fdc4622e-5eea-4fd3-8a40-6d3f142d0c48",
+        "40736f04-9d77-4621-b5ef-da2a39095d05",
+        "f4487321-0dad-432a-9fe6-dc4e7f287843",
+        "ee500ebd-f739-4f9a-bbc2-62c764060355",
+        "2de8a2a9-53e0-4402-b420-977d048aebe9",
+        "299cdb5a-88cc-4f5e-b9f6-03927d1ebbfd",
+        "fcc8c1b2-53d9-42f3-b611-2055f7a735bc",
+        "ceca5e47-b89f-4ea6-8ecb-b98142ae6ff1",
+        "51c91b73-fa07-4674-8ca5-d4a19e5e245a",
+        "130ca793-eb67-421b-9b7f-f5a0f7241471"
+      ],
+      "false_positive_findings": null,
+      "false_positive_note": "Requires independent oracle adjudication; not inferred from invariant failures."
+    },
+    {
+      "strategy": "coverage",
+      "seed": 17,
+      "budget": 12,
+      "executed": 12,
+      "unique_bugs": 4,
+      "unique_violation_signatures": 4,
+      "experiments_until_first_finding": 1,
+      "execution_cost_seconds": 9.632095335007762,
+      "classification_counts": {
+        "APPLICATION_VIOLATION": 5,
+        "INJECTION_NOT_OBSERVED": 3,
+        "NO_VIOLATION": 4
+      },
+      "trial_ids": [
+        "7eaaf85a-c3d0-4afc-bea7-786c76643e53",
+        "045146b3-89b9-4ee2-8d1e-c4f8d3d4cdcc",
+        "8eeaf8b9-0741-4d77-9825-d522c221a773",
+        "82bc77ed-8eb4-49a7-9610-cca9fdd3aa54",
+        "0eb50d1a-6bb6-4027-94d5-4e6416132e6b",
+        "c37754f3-00d7-4d35-a25b-f94e853ebeed",
+        "803da554-89c5-4580-b944-ace9f40d9bc7",
+        "fe3c25a8-5f97-42ee-91c0-dcd8d9d030da",
+        "b4e4e785-f4ee-409e-9351-583be9ce08f0",
+        "d481bf77-042a-4e9c-b314-1b539592e84a",
+        "4e46bcff-de29-4a5c-a96b-51fafa6058c9",
+        "e01a292b-d854-42ef-849e-9aab6cdcfc56"
+      ],
+      "false_positive_findings": null,
+      "false_positive_note": "Requires independent oracle adjudication; not inferred from invariant failures."
+    },
+    {
+      "strategy": "adaptive",
+      "seed": 17,
+      "budget": 12,
+      "executed": 12,
+      "unique_bugs": 3,
+      "unique_violation_signatures": 3,
+      "experiments_until_first_finding": 1,
+      "execution_cost_seconds": 9.024409208999714,
+      "classification_counts": {
+        "APPLICATION_VIOLATION": 6,
+        "INJECTION_NOT_OBSERVED": 1,
+        "NO_VIOLATION": 5
+      },
+      "trial_ids": [
+        "3b976843-c65a-4e84-a1be-48f09dc9dbcf",
+        "77cc9a94-f407-418b-a03f-8ef6bb7f09c3",
+        "d1f8bc12-8bc6-4a28-bf06-651eef5827d8",
+        "d7276cb2-43f5-4a74-adde-c04b2bff8ce7",
+        "6e979567-4afb-4a3f-a2bb-bf02b438becc",
+        "7b876402-9b12-47ee-92a8-abf4172c0797",
+        "3457ad22-0746-4c6d-9345-d21e050ac59b",
+        "2a340b40-4d86-40bd-b89c-288e4100633f",
+        "99e5d8fa-e121-419f-a3bb-90c41b20c3fa",
+        "35e7048a-b53e-4680-baff-224849cdc62e",
+        "71a5b1e5-ead5-4388-9917-c349e871b9bb",
+        "993c2bb4-fe72-4785-bbb1-d17ec42e12db"
+      ],
+      "false_positive_findings": null,
+      "false_positive_note": "Requires independent oracle adjudication; not inferred from invariant failures."
+    },
+    {
+      "strategy": "coverage",
+      "seed": 42,
+      "budget": 12,
+      "executed": 12,
+      "unique_bugs": 4,
+      "unique_violation_signatures": 5,
+      "experiments_until_first_finding": 4,
+      "execution_cost_seconds": 9.556668125005672,
+      "classification_counts": {
+        "APPLICATION_VIOLATION": 6,
+        "INJECTION_NOT_OBSERVED": 2,
+        "NO_VIOLATION": 4
+      },
+      "trial_ids": [
+        "5e085036-f277-4569-b766-b62d6b980c2d",
+        "5be2f9ff-0c02-4a75-a4fb-6e00029376f1",
+        "af9811b7-41b4-4a0c-b326-5335dd412972",
+        "03f65d9d-64d0-4474-a520-efd474b990c6",
+        "bb42a666-f432-4080-b8c4-0fbd141b73eb",
+        "8da4e352-fee5-406f-bc41-35c968ee5594",
+        "504c0a57-4e34-470d-8e08-4f63a25f0387",
+        "fe503c54-87d4-4fb4-a44e-73aaf40e4ebb",
+        "4afa9e6b-95f4-4460-b077-063ad1b72130",
+        "740b1f90-30e9-4fa3-a405-cfa635438f4e",
+        "cd9355b4-3861-4ee7-b20b-2dd55bdcb82c",
+        "0e819151-f46b-4920-8272-420ba436f9d8"
+      ],
+      "false_positive_findings": null,
+      "false_positive_note": "Requires independent oracle adjudication; not inferred from invariant failures."
+    },
+    {
+      "strategy": "adaptive",
+      "seed": 42,
+      "budget": 12,
+      "executed": 12,
+      "unique_bugs": 3,
+      "unique_violation_signatures": 3,
+      "experiments_until_first_finding": 1,
+      "execution_cost_seconds": 9.012216543007526,
+      "classification_counts": {
+        "APPLICATION_VIOLATION": 6,
+        "INJECTION_NOT_OBSERVED": 1,
+        "NO_VIOLATION": 5
+      },
+      "trial_ids": [
+        "428365bd-bfd7-48a8-af31-8ceb3be2da2c",
+        "f5c1d101-250d-4fbf-a4e6-cade8261e2de",
+        "f246e4b2-dd37-4052-95ca-b1536a4eaaeb",
+        "e30e0155-0581-4bb7-aa06-e8d66e1460b0",
+        "31329688-2c4b-4a8a-9f23-201e48589cac",
+        "1671fab5-9872-4074-b290-4036f8cad4b7",
+        "54b00906-ce02-4c21-bcd9-ca67a23489de",
+        "bfe8a223-1d20-4141-a2c5-da3fe392bcb1",
+        "f7b2a2e7-fca9-4deb-9f6a-a73b7159b516",
+        "6ff55af8-1034-4cd7-9056-09fe3ddca5e9",
+        "708085f7-8335-4014-ad01-1148b146244a",
+        "39731ff2-a1ec-4111-8e45-e91646c3c771"
+      ],
+      "false_positive_findings": null,
+      "false_positive_note": "Requires independent oracle adjudication; not inferred from invariant failures."
+    },
+    {
+      "strategy": "random",
+      "seed": 42,
+      "budget": 12,
+      "executed": 12,
+      "unique_bugs": 3,
+      "unique_violation_signatures": 4,
+      "experiments_until_first_finding": 1,
+      "execution_cost_seconds": 7.960133582993876,
+      "classification_counts": {
+        "APPLICATION_VIOLATION": 6,
+        "NO_VIOLATION": 6
+      },
+      "trial_ids": [
+        "97b18393-228e-4eac-9ca3-162d5735ba48",
+        "de32365f-1acd-4df9-9a14-631ffe6f0af8",
+        "c81fe920-a407-45c4-aae1-418ab4bb9a58",
+        "a63840c4-c193-4521-bcf2-0acb77d73cd7",
+        "9a6a8761-6935-4152-8329-299c146cc640",
+        "e8de4794-90a9-4de0-b6ea-9ac8e938b58b",
+        "91345e01-b1e1-4729-bb13-81d73c88f62b",
+        "f15171b2-c062-4472-866d-79b95d5bb7e5",
+        "bc2bb365-66c1-48e7-b81a-b3a658124e96",
+        "ec840bf1-589a-44dd-8971-6069702bcd51",
+        "262bc2a6-0127-4d20-ad87-cde2569716b1",
+        "31ca2b72-af80-4489-80bf-5e272efd3a45"
+      ],
+      "false_positive_findings": null,
+      "false_positive_note": "Requires independent oracle adjudication; not inferred from invariant failures."
+    },
+    {
+      "strategy": "adaptive",
+      "seed": 93,
+      "budget": 12,
+      "executed": 12,
+      "unique_bugs": 3,
+      "unique_violation_signatures": 3,
+      "experiments_until_first_finding": 1,
+      "execution_cost_seconds": 9.031607207958587,
+      "classification_counts": {
+        "APPLICATION_VIOLATION": 5,
+        "INJECTION_NOT_OBSERVED": 2,
+        "NO_VIOLATION": 5
+      },
+      "trial_ids": [
+        "b501b6f1-d628-4e67-98df-1db656a56f5e",
+        "38d563c2-cd5b-4c10-b794-b1bb4901e2e2",
+        "90298742-925a-42b7-818f-21bc0beb3eaa",
+        "6f77646b-6fb3-452d-a4a5-c05dd60dd3ae",
+        "d2ea8c66-0644-4648-af9f-bcef73403502",
+        "9f8196ec-8163-4a07-bd84-141ec7877de7",
+        "8b6a1c0e-4664-4ca7-b914-dadef43fc28c",
+        "37a436e1-7498-4f21-a2a4-94c8d02fc952",
+        "fb085f2a-0b15-4180-bee7-a4528edb5f1a",
+        "e6675290-cf4e-472f-9773-f53b06223b27",
+        "870b1ae0-f9de-4912-808f-341672522ec5",
+        "03597c38-cb3c-474a-8cae-eebc5777db18"
+      ],
+      "false_positive_findings": null,
+      "false_positive_note": "Requires independent oracle adjudication; not inferred from invariant failures."
+    },
+    {
+      "strategy": "random",
+      "seed": 93,
+      "budget": 12,
+      "executed": 12,
+      "unique_bugs": 6,
+      "unique_violation_signatures": 7,
+      "experiments_until_first_finding": 2,
+      "execution_cost_seconds": 9.722971917013638,
+      "classification_counts": {
+        "APPLICATION_VIOLATION": 8,
+        "INJECTION_NOT_OBSERVED": 1,
+        "NO_VIOLATION": 3
+      },
+      "trial_ids": [
+        "f2cc07bb-666b-4582-a052-136a41e1f15d",
+        "43799d06-9e68-47b9-b46d-4c9437e6799b",
+        "9e6a5268-6a77-4c3d-a929-197801a228bf",
+        "4ddf064d-84da-43e9-98a4-c2c023b65f4f",
+        "73b66ddc-1512-47c1-8576-28e82161ffa1",
+        "9edfdbc0-3a0e-493c-906e-caed489a5a6d",
+        "55b3dc8c-e7bb-46d8-9475-3209e7fd7318",
+        "ce50dffb-a25c-4664-a2a7-9e33557ba971",
+        "6b060184-5c3e-4d8e-8a54-ca17ea91297a",
+        "c9895f30-028d-404c-8656-bb735e87af9b",
+        "8eb751f6-b5a0-4020-b9ad-760827413af0",
+        "3fd12011-e04e-4654-b218-b1a2e13cec9b"
+      ],
+      "false_positive_findings": null,
+      "false_positive_note": "Requires independent oracle adjudication; not inferred from invariant failures."
+    },
+    {
+      "strategy": "coverage",
+      "seed": 93,
+      "budget": 12,
+      "executed": 12,
+      "unique_bugs": 6,
+      "unique_violation_signatures": 7,
+      "experiments_until_first_finding": 1,
+      "execution_cost_seconds": 9.641343875002349,
+      "classification_counts": {
+        "APPLICATION_VIOLATION": 8,
+        "INJECTION_NOT_OBSERVED": 3,
+        "NO_VIOLATION": 1
+      },
+      "trial_ids": [
+        "6ab24a5a-70cd-4d70-aa73-b0c00a600d20",
+        "bc2c02cc-ff1d-41f6-88e7-d3e2f59635af",
+        "b8dc95c8-2f1e-41c7-8d4a-66ca567f4dd8",
+        "3f55817e-1e92-4772-856f-f24e811fea11",
+        "413a07ed-c17c-452e-a6d8-1b895519879b",
+        "a5e0e18a-3567-4edf-aebd-224b03dd699d",
+        "c85a58db-de72-4b0a-b093-2cb541fcad46",
+        "efef0026-dad6-4f4c-a3b7-9ca029e98f12",
+        "4e2825b8-4651-464e-8882-f13d0754b3bb",
+        "b76006b9-fa90-4cca-9ee4-c2a104e5fff0",
+        "34af8dce-ad0b-4ea0-94ed-128af0fa39ce",
+        "bf6e2c79-e13b-4fe4-9891-71fa671cdf5f"
+      ],
+      "false_positive_findings": null,
+      "false_positive_note": "Requires independent oracle adjudication; not inferred from invariant failures."
+    }
+  ],
+  "mean_unique_bugs": {
+    "random": 4.333333333333333,
+    "coverage": 4.666666666666667,
+    "adaptive": 3
+  },
+  "sample_stddev_unique_bugs": {
+    "random": 1.5275252316519468,
+    "coverage": 1.1547005383792515,
+    "adaptive": 0.0
+  },
+  "adaptive_improved_observed_mean": false,
+  "seeds": [
+    17,
+    42,
+    93
+  ],
+  "budget_per_strategy_per_seed": 12,
+  "reference_comparisons": [
+    {
+      "defect": "concurrent_retry",
+      "original_trial_id": "4b8ea2b2-32be-4344-87f7-1d29444b2911",
+      "repeat_trial_id": "fcba73ec-efed-47e8-ba85-6ebe3d53a592",
+      "reference_trial_id": "e83cec39-86b6-4c09-9afe-90e53750cc36",
+      "baseline_trial_id": "82b32f12-dd26-4b26-930e-32e93299ac8c",
+      "original": "APPLICATION_VIOLATION",
+      "reference": "NO_VIOLATION",
+      "baseline": "NO_VIOLATION",
+      "repeat_matches_signature": true,
+      "reference_wall_delta_seconds": 0.014452375005930662
+    },
+    {
+      "defect": "failed_compensation",
+      "original_trial_id": "4259dcfe-dc0a-4bae-82f3-70db1ad17256",
+      "repeat_trial_id": "9e8bbbdc-f84f-42ee-8d85-ed997d8ee47b",
+      "reference_trial_id": "39f1ead5-02de-45a4-9c04-bebf46b0945d",
+      "baseline_trial_id": "6c655af5-a941-4bd6-b344-043a72cc4894",
+      "original": "APPLICATION_VIOLATION",
+      "reference": "NO_VIOLATION",
+      "baseline": "NO_VIOLATION",
+      "repeat_matches_signature": true,
+      "reference_wall_delta_seconds": 0.0008786669932305813
+    },
+    {
+      "defect": "inventory_drift",
+      "original_trial_id": "b2800b7b-d874-467c-a830-2762674a1adc",
+      "repeat_trial_id": "134e13ba-da9b-4632-a40a-b8f3d2d30fce",
+      "reference_trial_id": "7a69fa8f-48e0-4e40-a95b-d9404336c4d2",
+      "baseline_trial_id": "848cbe46-fea5-4745-910d-806c2e23de65",
+      "original": "APPLICATION_VIOLATION",
+      "reference": "NO_VIOLATION",
+      "baseline": "NO_VIOLATION",
+      "repeat_matches_signature": true,
+      "reference_wall_delta_seconds": -0.0001925830147229135
+    },
+    {
+      "defect": "lost_finalization",
+      "original_trial_id": "277e7ebc-32bf-42ea-8b46-4efe2838a381",
+      "repeat_trial_id": "691acbf7-f7da-45d9-a133-f36603e0ede6",
+      "reference_trial_id": "9f327fa3-1454-4aad-a17c-fbe6703c4d16",
+      "baseline_trial_id": "47d0273e-0d5d-4202-b6e9-a247baa4f8cf",
+      "original": "APPLICATION_VIOLATION",
+      "reference": "NO_VIOLATION",
+      "baseline": "NO_VIOLATION",
+      "repeat_matches_signature": true,
+      "reference_wall_delta_seconds": -0.009382457996252924
+    },
+    {
+      "defect": "payment_ack_loss",
+      "original_trial_id": "357e6b03-26ca-4522-8a23-8c5d92ee1552",
+      "repeat_trial_id": "f24dbf90-572c-419c-81e1-210b893611d0",
+      "reference_trial_id": "50f8bb36-b8b6-4951-9aae-dd09f8dd1170",
+      "baseline_trial_id": "cbe178f4-58db-40a7-9f1a-b1859d8e79d0",
+      "original": "APPLICATION_VIOLATION",
+      "reference": "NO_VIOLATION",
+      "baseline": "NO_VIOLATION",
+      "repeat_matches_signature": true,
+      "reference_wall_delta_seconds": 0.0033245819940930232
+    },
+    {
+      "defect": "unsafe_retry",
+      "original_trial_id": "4e409c8e-4029-48da-8844-d75490d7836b",
+      "repeat_trial_id": "d3fb9d15-a523-41cf-9844-4cd6c55ab2b1",
+      "reference_trial_id": "40b83713-9dc1-4bd5-9a91-bf10c1a6e794",
+      "baseline_trial_id": "b26bccfd-e64f-4699-a5f3-1e017c90fc29",
+      "original": "APPLICATION_VIOLATION",
+      "reference": "NO_VIOLATION",
+      "baseline": "NO_VIOLATION",
+      "repeat_matches_signature": true,
+      "reference_wall_delta_seconds": 0.01609308300248813
+    }
+  ],
+  "reference_comparison_note": "Shipped reference controls, not generated candidate verification.",
+  "held_out_evaluation": [
+    {
+      "defect": "concurrent_retry",
+      "scenario": {
+        "defect": "concurrent_retry",
+        "actions": [
+          {
+            "boundary": "charge",
+            "kind": "latency",
+            "phase": "after",
+            "delay_ms": 275,
+            "at_ms": 0,
+            "max_hits": 1
+          }
+        ],
+        "amount": 37,
+        "quantity": 3,
+        "concurrency": 2,
+        "consistency_ms": 100
+      },
+      "repetition": 0,
+      "original_trial_id": "fcd9fbef-b710-40f3-8122-80f1802ca634",
+      "reference_trial_id": "cefc5e96-6996-4f7a-8c7a-f509b05ffce7",
+      "original": "APPLICATION_VIOLATION",
+      "reference": "NO_VIOLATION",
+      "wall_delta_seconds": -0.037966915988363326
+    },
+    {
+      "defect": "concurrent_retry",
+      "scenario": {
+        "defect": "concurrent_retry",
+        "actions": [
+          {
+            "boundary": "charge",
+            "kind": "latency",
+            "phase": "after",
+            "delay_ms": 275,
+            "at_ms": 0,
+            "max_hits": 1
+          }
+        ],
+        "amount": 37,
+        "quantity": 3,
+        "concurrency": 2,
+        "consistency_ms": 100
+      },
+      "repetition": 1,
+      "original_trial_id": "e69a3b01-efff-45a2-b484-3f8acc08d275",
+      "reference_trial_id": "6d87b11c-c996-4896-81e7-33a09f38ef90",
+      "original": "APPLICATION_VIOLATION",
+      "reference": "NO_VIOLATION",
+      "wall_delta_seconds": 0.0112486239959253
+    },
+    {
+      "defect": "failed_compensation",
+      "scenario": {
+        "defect": "failed_compensation",
+        "actions": [
+          {
+            "boundary": "finalize",
+            "kind": "http_503",
+            "phase": "before",
+            "delay_ms": 180,
+            "at_ms": 0,
+            "max_hits": 1
+          },
+          {
+            "boundary": "refund",
+            "kind": "http_503",
+            "phase": "before",
+            "delay_ms": 180,
+            "at_ms": 0,
+            "max_hits": 1
+          }
+        ],
+        "amount": 37,
+        "quantity": 3,
+        "concurrency": 1,
+        "consistency_ms": 100
+      },
+      "repetition": 0,
+      "original_trial_id": "46247a27-8a21-4969-9f43-7bd378e7b85e",
+      "reference_trial_id": "0f46e57b-246b-402d-bbc8-4159c173d18d",
+      "original": "APPLICATION_VIOLATION",
+      "reference": "NO_VIOLATION",
+      "wall_delta_seconds": -0.005413541992311366
+    },
+    {
+      "defect": "failed_compensation",
+      "scenario": {
+        "defect": "failed_compensation",
+        "actions": [
+          {
+            "boundary": "finalize",
+            "kind": "http_503",
+            "phase": "before",
+            "delay_ms": 180,
+            "at_ms": 0,
+            "max_hits": 1
+          },
+          {
+            "boundary": "refund",
+            "kind": "http_503",
+            "phase": "before",
+            "delay_ms": 180,
+            "at_ms": 0,
+            "max_hits": 1
+          }
+        ],
+        "amount": 37,
+        "quantity": 3,
+        "concurrency": 1,
+        "consistency_ms": 100
+      },
+      "repetition": 1,
+      "original_trial_id": "fe75408a-e55b-4f85-9479-4d89ce9cbedc",
+      "reference_trial_id": "97cb2690-4486-4f87-912d-988505386b9b",
+      "original": "APPLICATION_VIOLATION",
+      "reference": "NO_VIOLATION",
+      "wall_delta_seconds": 0.008960623992606997
+    },
+    {
+      "defect": "inventory_drift",
+      "scenario": {
+        "defect": "inventory_drift",
+        "actions": [
+          {
+            "boundary": "reserve",
+            "kind": "latency",
+            "phase": "after",
+            "delay_ms": 275,
+            "at_ms": 0,
+            "max_hits": 1
+          }
+        ],
+        "amount": 37,
+        "quantity": 3,
+        "concurrency": 1,
+        "consistency_ms": 100
+      },
+      "repetition": 0,
+      "original_trial_id": "c6b1aa41-1af7-4f78-bf8e-887520f11ee1",
+      "reference_trial_id": "b00e704a-7269-4a1c-a448-f241eecace02",
+      "original": "APPLICATION_VIOLATION",
+      "reference": "NO_VIOLATION",
+      "wall_delta_seconds": -0.008929958989028819
+    },
+    {
+      "defect": "inventory_drift",
+      "scenario": {
+        "defect": "inventory_drift",
+        "actions": [
+          {
+            "boundary": "reserve",
+            "kind": "latency",
+            "phase": "after",
+            "delay_ms": 275,
+            "at_ms": 0,
+            "max_hits": 1
+          }
+        ],
+        "amount": 37,
+        "quantity": 3,
+        "concurrency": 1,
+        "consistency_ms": 100
+      },
+      "repetition": 1,
+      "original_trial_id": "8b92b9c0-572f-4c41-8e86-91c080f363dc",
+      "reference_trial_id": "0fe712ac-952e-4b43-8697-56f7d172c432",
+      "original": "APPLICATION_VIOLATION",
+      "reference": "NO_VIOLATION",
+      "wall_delta_seconds": -0.017043249987182207
+    },
+    {
+      "defect": "lost_finalization",
+      "scenario": {
+        "defect": "lost_finalization",
+        "actions": [
+          {
+            "boundary": "finalize",
+            "kind": "http_503",
+            "phase": "before",
+            "delay_ms": 180,
+            "at_ms": 0,
+            "max_hits": 1
+          }
+        ],
+        "amount": 37,
+        "quantity": 3,
+        "concurrency": 1,
+        "consistency_ms": 100
+      },
+      "repetition": 0,
+      "original_trial_id": "8a7e63ce-3e51-431e-91fa-ac4c49e5e8f8",
+      "reference_trial_id": "97808322-d484-4d8a-a925-7136fac1dd22",
+      "original": "APPLICATION_VIOLATION",
+      "reference": "NO_VIOLATION",
+      "wall_delta_seconds": -0.0003205419925507158
+    },
+    {
+      "defect": "lost_finalization",
+      "scenario": {
+        "defect": "lost_finalization",
+        "actions": [
+          {
+            "boundary": "finalize",
+            "kind": "http_503",
+            "phase": "before",
+            "delay_ms": 180,
+            "at_ms": 0,
+            "max_hits": 1
+          }
+        ],
+        "amount": 37,
+        "quantity": 3,
+        "concurrency": 1,
+        "consistency_ms": 100
+      },
+      "repetition": 1,
+      "original_trial_id": "2773b6af-eac9-41df-a7a8-916df5808c3b",
+      "reference_trial_id": "60150f47-306b-4a0f-880e-2c8af1f1ea1b",
+      "original": "APPLICATION_VIOLATION",
+      "reference": "NO_VIOLATION",
+      "wall_delta_seconds": 0.0006799160037189722
+    },
+    {
+      "defect": "payment_ack_loss",
+      "scenario": {
+        "defect": "payment_ack_loss",
+        "actions": [
+          {
+            "boundary": "charge",
+            "kind": "latency",
+            "phase": "after",
+            "delay_ms": 275,
+            "at_ms": 0,
+            "max_hits": 1
+          }
+        ],
+        "amount": 37,
+        "quantity": 3,
+        "concurrency": 1,
+        "consistency_ms": 100
+      },
+      "repetition": 0,
+      "original_trial_id": "0818c007-7f4b-4057-8594-e7fa93d99263",
+      "reference_trial_id": "61a0a917-5807-433d-a0d5-499067939e67",
+      "original": "APPLICATION_VIOLATION",
+      "reference": "NO_VIOLATION",
+      "wall_delta_seconds": 0.012366374998237006
+    },
+    {
+      "defect": "payment_ack_loss",
+      "scenario": {
+        "defect": "payment_ack_loss",
+        "actions": [
+          {
+            "boundary": "charge",
+            "kind": "latency",
+            "phase": "after",
+            "delay_ms": 275,
+            "at_ms": 0,
+            "max_hits": 1
+          }
+        ],
+        "amount": 37,
+        "quantity": 3,
+        "concurrency": 1,
+        "consistency_ms": 100
+      },
+      "repetition": 1,
+      "original_trial_id": "2a25322c-c00e-4f9b-8747-90e8348e6600",
+      "reference_trial_id": "8844c75c-8cc9-4d56-9ec6-842947e551ce",
+      "original": "APPLICATION_VIOLATION",
+      "reference": "NO_VIOLATION",
+      "wall_delta_seconds": 0.02308687499316875
+    },
+    {
+      "defect": "unsafe_retry",
+      "scenario": {
+        "defect": "unsafe_retry",
+        "actions": [
+          {
+            "boundary": "charge",
+            "kind": "latency",
+            "phase": "after",
+            "delay_ms": 275,
+            "at_ms": 0,
+            "max_hits": 1
+          }
+        ],
+        "amount": 37,
+        "quantity": 3,
+        "concurrency": 1,
+        "consistency_ms": 100
+      },
+      "repetition": 0,
+      "original_trial_id": "be1d2fdd-3117-4960-9d96-9ee3d87d08cf",
+      "reference_trial_id": "b46200ad-2e58-4ce3-be6d-274e70d087aa",
+      "original": "APPLICATION_VIOLATION",
+      "reference": "NO_VIOLATION",
+      "wall_delta_seconds": -0.010912083002040163
+    },
+    {
+      "defect": "unsafe_retry",
+      "scenario": {
+        "defect": "unsafe_retry",
+        "actions": [
+          {
+            "boundary": "charge",
+            "kind": "latency",
+            "phase": "after",
+            "delay_ms": 275,
+            "at_ms": 0,
+            "max_hits": 1
+          }
+        ],
+        "amount": 37,
+        "quantity": 3,
+        "concurrency": 1,
+        "consistency_ms": 100
+      },
+      "repetition": 1,
+      "original_trial_id": "a5bb22d1-debc-4645-9c91-d92bd3d1a187",
+      "reference_trial_id": "08c6030d-fd44-45db-ac33-d4be40d25243",
+      "original": "APPLICATION_VIOLATION",
+      "reference": "NO_VIOLATION",
+      "wall_delta_seconds": -0.007119916015653871
+    }
+  ],
+  "held_out_executed": 24,
+  "witness_reproduction_matches": 6,
+  "witness_pairs": 6,
+  "unexpected_control_violations": 0,
+  "adjudicated_false_positive_findings": null,
+  "comparator_controls": [
+    {
+      "control": "trusted reference recovery",
+      "outcome": "PATCH_PASSES_TESTED_SCENARIOS",
+      "cases": [
+        {
+          "name": "original_failure",
+          "original_trial_id": "3ed71def-eee1-43ad-9dba-fbbee214e28e",
+          "comparison_trial_id": "15fe4c3f-bec9-4a81-87f3-5c1527e771e0",
+          "original": "APPLICATION_VIOLATION",
+          "comparison": "NO_VIOLATION",
+          "wall_delta_seconds": 0.002973750000819564,
+          "gateway_cpu_delta_seconds": 0.001454999999999984
+        },
+        {
+          "name": "repeat_failure",
+          "original_trial_id": "961e0634-6cd3-4714-9118-85f1685e909c",
+          "comparison_trial_id": "6277ac87-4f3e-4913-b0cd-2b62fd598bbe",
+          "original": "APPLICATION_VIOLATION",
+          "comparison": "NO_VIOLATION",
+          "wall_delta_seconds": -0.03104962500219699,
+          "gateway_cpu_delta_seconds": -0.0015099999999996783
+        },
+        {
+          "name": "regression_no_fault",
+          "original_trial_id": "3106dd2b-8071-467d-837c-ec915c2d0baa",
+          "comparison_trial_id": "07c04780-5c52-4a1c-b148-c7c0a3b90e38",
+          "original": "NO_VIOLATION",
+          "comparison": "NO_VIOLATION",
+          "wall_delta_seconds": -0.030157707980833948,
+          "gateway_cpu_delta_seconds": 0.0017210000000016379
+        },
+        {
+          "name": "heldout_inputs",
+          "original_trial_id": "c542340c-0ca0-4c96-befc-e1e38656b527",
+          "comparison_trial_id": "271550b4-39e5-42a9-a6fa-f295412fce91",
+          "original": "APPLICATION_VIOLATION",
+          "comparison": "NO_VIOLATION",
+          "wall_delta_seconds": 0.0017685420025372878,
+          "gateway_cpu_delta_seconds": 0.001933999999998548
+        },
+        {
+          "name": "heldout_timing",
+          "original_trial_id": "0a692d2f-396c-49e1-b945-6bb18963a73f",
+          "comparison_trial_id": "acae4a33-47e0-4f2a-b6a1-dc331078da3c",
+          "original": "APPLICATION_VIOLATION",
+          "comparison": "NO_VIOLATION",
+          "wall_delta_seconds": 0.004059166996739805,
+          "gateway_cpu_delta_seconds": 0.0015729999999987143
+        },
+        {
+          "name": "related_concurrency",
+          "original_trial_id": "47860bc3-a3f6-4ec0-897a-7b2141b4609d",
+          "comparison_trial_id": "7fa4d7df-4bdd-4aca-a9b1-505908df8c78",
+          "original": "APPLICATION_VIOLATION",
+          "comparison": "NO_VIOLATION",
+          "wall_delta_seconds": 0.00913441700686235,
+          "gateway_cpu_delta_seconds": 0.004218999999999085
+        }
+      ],
+      "limitations": [
+        "Finite benchmark scenarios do not prove absence of bugs.",
+        "Held-outs are fixed independent verification cases, not random samples of all possible failures.",
+        "Wall and gateway process CPU time are measured; full-system resource overhead is not measured.",
+        "Timeouts and process scheduling remain nondeterministic."
+      ]
+    },
+    {
+      "control": "unmodified vulnerable implementation",
+      "outcome": "PATCH_FAILS_VERIFICATION",
+      "cases": [
+        {
+          "name": "original_failure",
+          "original_trial_id": "4f5f9316-514b-49ab-8389-6bd7e2ff0fd5",
+          "comparison_trial_id": "419d9f13-ca2c-41de-80cf-b04161733f98",
+          "original": "APPLICATION_VIOLATION",
+          "comparison": "APPLICATION_VIOLATION",
+          "wall_delta_seconds": 0.002374540999880992,
+          "gateway_cpu_delta_seconds": 3.6999999998954536e-05
+        },
+        {
+          "name": "repeat_failure",
+          "original_trial_id": "70b5663a-238c-4013-9427-bd6887661eaf",
+          "comparison_trial_id": "97c9f5a6-c22d-4ce4-be4f-df7b6bc0d938",
+          "original": "APPLICATION_VIOLATION",
+          "comparison": "APPLICATION_VIOLATION",
+          "wall_delta_seconds": 0.035316417008289136,
+          "gateway_cpu_delta_seconds": -0.002326999999999302
+        },
+        {
+          "name": "regression_no_fault",
+          "original_trial_id": "19ee8a13-ed92-47f2-a773-88817ae874be",
+          "comparison_trial_id": "6833dfd6-adaa-41ac-9104-4a1d9e5a6ceb",
+          "original": "NO_VIOLATION",
+          "comparison": "NO_VIOLATION",
+          "wall_delta_seconds": 0.003157249011565,
+          "gateway_cpu_delta_seconds": -7.999999999341867e-06
+        },
+        {
+          "name": "heldout_inputs",
+          "original_trial_id": "8e6dbc9e-1fbe-4a6f-a125-33e2d56f05b7",
+          "comparison_trial_id": "c74a990b-be03-46b7-9c04-b7f20f40fd1b",
+          "original": "APPLICATION_VIOLATION",
+          "comparison": "APPLICATION_VIOLATION",
+          "wall_delta_seconds": -0.0026011250010924414,
+          "gateway_cpu_delta_seconds": 0.0006089999999971951
+        },
+        {
+          "name": "heldout_timing",
+          "original_trial_id": "dbb6ec8b-b593-49b7-8af9-492a46fb3cfe",
+          "comparison_trial_id": "3349e2bf-9428-4e83-a309-9340a7ee722c",
+          "original": "APPLICATION_VIOLATION",
+          "comparison": "APPLICATION_VIOLATION",
+          "wall_delta_seconds": 0.002297208004165441,
+          "gateway_cpu_delta_seconds": 0.0033209999999996853
+        },
+        {
+          "name": "related_concurrency",
+          "original_trial_id": "413044fb-a506-47b7-b6f7-0ec96b6cc8d5",
+          "comparison_trial_id": "ff3d01b6-d73b-4b24-bbcc-2858aba91338",
+          "original": "APPLICATION_VIOLATION",
+          "comparison": "APPLICATION_VIOLATION",
+          "wall_delta_seconds": -0.0018755000055534765,
+          "gateway_cpu_delta_seconds": -0.0006970000000006138
+        }
+      ],
+      "limitations": [
+        "Finite benchmark scenarios do not prove absence of bugs.",
+        "Held-outs are fixed independent verification cases, not random samples of all possible failures.",
+        "Wall and gateway process CPU time are measured; full-system resource overhead is not measured.",
+        "Timeouts and process scheduling remain nondeterministic."
+      ]
+    }
+  ],
+  "comparator_control_accuracy": 1.0,
+  "comparator_accuracy_scope": "Two known shipped controls only; not general verification accuracy.",
+  "minimization_control": {
+    "original": {
+      "defect": "concurrent_retry",
+      "actions": [
+        {
+          "boundary": "charge",
+          "kind": "latency",
+          "phase": "after",
+          "delay_ms": 180,
+          "at_ms": 0,
+          "max_hits": 1
+        },
+        {
+          "boundary": "reserve",
+          "kind": "latency",
+          "phase": "before",
+          "delay_ms": 10,
+          "at_ms": 0,
+          "max_hits": 1
+        }
+      ],
+      "amount": 100,
+      "quantity": 1,
+      "concurrency": 2,
+      "consistency_ms": 100
+    },
+    "reduced": {
+      "defect": "concurrent_retry",
+      "actions": [
+        {
+          "boundary": "charge",
+          "kind": "latency",
+          "phase": "after",
+          "delay_ms": 90,
+          "at_ms": 0,
+          "max_hits": 1
+        }
+      ],
+      "amount": 1,
+      "quantity": 1,
+      "concurrency": 2,
+      "consistency_ms": 100
+    },
+    "removed_events": [
+      {
+        "boundary": "reserve",
+        "kind": "latency",
+        "phase": "before",
+        "delay_ms": 10,
+        "at_ms": 0,
+        "max_hits": 1
+      }
+    ],
+    "attempts": [
+      {
+        "stage": "confirm_original",
+        "scenario": {
+          "defect": "concurrent_retry",
+          "actions": [
+            {
+              "boundary": "charge",
+              "kind": "latency",
+              "phase": "after",
+              "delay_ms": 180,
+              "at_ms": 0,
+              "max_hits": 1
+            },
+            {
+              "boundary": "reserve",
+              "kind": "latency",
+              "phase": "before",
+              "delay_ms": 10,
+              "at_ms": 0,
+              "max_hits": 1
+            }
+          ],
+          "amount": 100,
+          "quantity": 1,
+          "concurrency": 2,
+          "consistency_ms": 100
+        },
+        "trial_ids": [
+          "e25ffea8-c0ed-4c64-80f5-ede730ab0814",
+          "e7d9c339-8ee5-41e4-85a4-a56080fecaef"
+        ],
+        "classifications": [
+          "APPLICATION_VIOLATION",
+          "APPLICATION_VIOLATION"
+        ],
+        "matching": 2,
+        "repeats": 2,
+        "accepted": true
+      },
+      {
+        "stage": "ddmin_remove",
+        "scenario": {
+          "defect": "concurrent_retry",
+          "actions": [
+            {
+              "boundary": "reserve",
+              "kind": "latency",
+              "phase": "before",
+              "delay_ms": 10,
+              "at_ms": 0,
+              "max_hits": 1
+            }
+          ],
+          "amount": 100,
+          "quantity": 1,
+          "concurrency": 2,
+          "consistency_ms": 100
+        },
+        "trial_ids": [
+          "f43f9bed-9f45-4e39-bae0-973c0241cf13",
+          "3893e4b6-877a-4187-b774-b9cb7f9b702a"
+        ],
+        "classifications": [
+          "APPLICATION_VIOLATION",
+          "APPLICATION_VIOLATION"
+        ],
+        "matching": 0,
+        "repeats": 2,
+        "accepted": false
+      },
+      {
+        "stage": "ddmin_remove",
+        "scenario": {
+          "defect": "concurrent_retry",
+          "actions": [
+            {
+              "boundary": "charge",
+              "kind": "latency",
+              "phase": "after",
+              "delay_ms": 180,
+              "at_ms": 0,
+              "max_hits": 1
+            }
+          ],
+          "amount": 100,
+          "quantity": 1,
+          "concurrency": 2,
+          "consistency_ms": 100
+        },
+        "trial_ids": [
+          "fe60eff0-ca7f-4eed-9171-bf7763a2f8c4",
+          "2fd31bf7-e739-4d61-9b69-ede29f4014e2"
+        ],
+        "classifications": [
+          "APPLICATION_VIOLATION",
+          "APPLICATION_VIOLATION"
+        ],
+        "matching": 2,
+        "repeats": 2,
+        "accepted": true
+      },
+      {
+        "stage": "ddmin_remove",
+        "scenario": {
+          "defect": "concurrent_retry",
+          "actions": [],
+          "amount": 100,
+          "quantity": 1,
+          "concurrency": 2,
+          "consistency_ms": 100
+        },
+        "trial_ids": [
+          "5866cf21-117d-4fc5-ae67-aa2121dbd8e6",
+          "b58bfced-1c9e-4de7-af85-59c52f96b928"
+        ],
+        "classifications": [
+          "APPLICATION_VIOLATION",
+          "APPLICATION_VIOLATION"
+        ],
+        "matching": 0,
+        "repeats": 2,
+        "accepted": false
+      },
+      {
+        "stage": "parameter_reduce",
+        "scenario": {
+          "defect": "concurrent_retry",
+          "actions": [
+            {
+              "boundary": "charge",
+              "kind": "latency",
+              "phase": "after",
+              "delay_ms": 0,
+              "at_ms": 0,
+              "max_hits": 1
+            }
+          ],
+          "amount": 100,
+          "quantity": 1,
+          "concurrency": 2,
+          "consistency_ms": 100
+        },
+        "trial_ids": [
+          "8ecf7dc5-9dfd-4874-85e3-fddb05b83d86",
+          "6e98acb3-b1bb-45c2-bacf-7558e077b2f7"
+        ],
+        "classifications": [
+          "APPLICATION_VIOLATION",
+          "APPLICATION_VIOLATION"
+        ],
+        "matching": 0,
+        "repeats": 2,
+        "accepted": false
+      },
+      {
+        "stage": "parameter_reduce",
+        "scenario": {
+          "defect": "concurrent_retry",
+          "actions": [
+            {
+              "boundary": "charge",
+              "kind": "latency",
+              "phase": "after",
+              "delay_ms": 90,
+              "at_ms": 0,
+              "max_hits": 1
+            }
+          ],
+          "amount": 100,
+          "quantity": 1,
+          "concurrency": 2,
+          "consistency_ms": 100
+        },
+        "trial_ids": [
+          "0079cf2a-d6aa-4c58-9408-c617d886c70e",
+          "2f53c1c0-9d8e-4346-bb92-e1db24f7ad95"
+        ],
+        "classifications": [
+          "APPLICATION_VIOLATION",
+          "APPLICATION_VIOLATION"
+        ],
+        "matching": 2,
+        "repeats": 2,
+        "accepted": true
+      },
+      {
+        "stage": "parameter_reduce",
+        "scenario": {
+          "defect": "concurrent_retry",
+          "actions": [
+            {
+              "boundary": "charge",
+              "kind": "latency",
+              "phase": "after",
+              "delay_ms": 0,
+              "at_ms": 0,
+              "max_hits": 1
+            }
+          ],
+          "amount": 100,
+          "quantity": 1,
+          "concurrency": 2,
+          "consistency_ms": 100
+        },
+        "trial_ids": [
+          "0022c14c-6730-4286-bc8a-51b81fdc9da7",
+          "49d9b203-a5f7-471a-b91a-c8958c9f43e8"
+        ],
+        "classifications": [
+          "APPLICATION_VIOLATION",
+          "APPLICATION_VIOLATION"
+        ],
+        "matching": 0,
+        "repeats": 2,
+        "accepted": false
+      },
+      {
+        "stage": "parameter_reduce",
+        "scenario": {
+          "defect": "concurrent_retry",
+          "actions": [
+            {
+              "boundary": "charge",
+              "kind": "latency",
+              "phase": "after",
+              "delay_ms": 45,
+              "at_ms": 0,
+              "max_hits": 1
+            }
+          ],
+          "amount": 100,
+          "quantity": 1,
+          "concurrency": 2,
+          "consistency_ms": 100
+        },
+        "trial_ids": [
+          "7084d9d0-2e8f-4edc-bba9-b7c1542e3aa9",
+          "cd206d89-134d-479a-bb19-b959c1d39373"
+        ],
+        "classifications": [
+          "APPLICATION_VIOLATION",
+          "APPLICATION_VIOLATION"
+        ],
+        "matching": 0,
+        "repeats": 2,
+        "accepted": false
+      },
+      {
+        "stage": "parameter_reduce",
+        "scenario": {
+          "defect": "concurrent_retry",
+          "actions": [
+            {
+              "boundary": "charge",
+              "kind": "latency",
+              "phase": "after",
+              "delay_ms": 90,
+              "at_ms": 0,
+              "max_hits": 1
+            }
+          ],
+          "amount": 1,
+          "quantity": 1,
+          "concurrency": 2,
+          "consistency_ms": 100
+        },
+        "trial_ids": [
+          "d74638c9-5ef2-433f-a398-e44fb7ae96d5",
+          "b751326e-4783-4410-b184-a734d4e756b0"
+        ],
+        "classifications": [
+          "APPLICATION_VIOLATION",
+          "APPLICATION_VIOLATION"
+        ],
+        "matching": 2,
+        "repeats": 2,
+        "accepted": true
+      },
+      {
+        "stage": "parameter_reduce",
+        "scenario": {
+          "defect": "concurrent_retry",
+          "actions": [
+            {
+              "boundary": "charge",
+              "kind": "latency",
+              "phase": "after",
+              "delay_ms": 0,
+              "at_ms": 0,
+              "max_hits": 1
+            }
+          ],
+          "amount": 1,
+          "quantity": 1,
+          "concurrency": 2,
+          "consistency_ms": 100
+        },
+        "trial_ids": [
+          "333dfe72-ebb6-469d-9c35-15b938f60377",
+          "2e3c1923-c568-4617-9204-c03cda64ab10"
+        ],
+        "classifications": [
+          "APPLICATION_VIOLATION",
+          "APPLICATION_VIOLATION"
+        ],
+        "matching": 0,
+        "repeats": 2,
+        "accepted": false
+      }
+    ],
+    "signature": "5690e6ce1d895f69d65f138f3601cee8c013079c4d5d7c25cc5babe2a66a7523",
+    "reproductions": 0,
+    "confirmation_trials": 0,
+    "local_minimality_tested": false,
+    "cost_seconds": 15.619457499022246,
+    "limitations": [
+      "Locality covers single fault deletions and the reported finite parameter lattice only.",
+      "Repeated success is empirical; scheduling, timeout and database nondeterminism remain.",
+      "Budget includes every replay, including inconclusive and infrastructure outcomes."
+    ]
+  },
+  "trial_counts_by_phase": {
+    "comparator_controls": 24,
+    "discovery": 108,
+    "held_out_evaluation": 24,
+    "minimization_control": 21,
+    "witness_controls": 24
+  },
+  "total_executed_trials": 201,
+  "total_trial_wall_seconds": 153.94882970697654,
+  "classification_counts": {
+    "APPLICATION_VIOLATION": 114,
+    "INJECTION_NOT_OBSERVED": 16,
+    "NO_VIOLATION": 71
+  },
+  "environment": {
+    "gateway": {
+      "role": "gateway",
+      "version": "phase4-local-source",
+      "policy_sha256": "67961b7da179a2a3d75a492e1835e11b244f5976536e27e62b2b5188694159d1",
+      "runtime_sha256": "d5e10c872bf15bf41751614bbf5d1d89821740521c6d9ab4c9229344d60b0aef",
+      "python": "3.13.15"
+    },
+    "order": {
+      "role": "order",
+      "version": "phase4-local-source",
+      "policy_sha256": "67961b7da179a2a3d75a492e1835e11b244f5976536e27e62b2b5188694159d1",
+      "runtime_sha256": "d5e10c872bf15bf41751614bbf5d1d89821740521c6d9ab4c9229344d60b0aef",
+      "python": "3.13.15"
+    },
+    "payment": {
+      "role": "payment",
+      "version": "phase4-local-source",
+      "policy_sha256": "67961b7da179a2a3d75a492e1835e11b244f5976536e27e62b2b5188694159d1",
+      "runtime_sha256": "d5e10c872bf15bf41751614bbf5d1d89821740521c6d9ab4c9229344d60b0aef",
+      "python": "3.13.15"
+    },
+    "inventory": {
+      "role": "inventory",
+      "version": "phase4-local-source",
+      "policy_sha256": "67961b7da179a2a3d75a492e1835e11b244f5976536e27e62b2b5188694159d1",
+      "runtime_sha256": "d5e10c872bf15bf41751614bbf5d1d89821740521c6d9ab4c9229344d60b0aef",
+      "python": "3.13.15"
+    }
+  },
+  "candidate_repair_verification_success": null,
+  "limitations": [
+    "Known seeded synthetic defects; no novel bug discovery claim.",
+    "Held-outs share defect families and are never used for planner updates.",
+    "Small repeated seed set; no statistical superiority claim.",
+    "Unadjudicated findings do not establish a global false-positive rate.",
+    "Generated candidate accuracy requires isolated Docker verification.",
+    "Wall costs include controlled waits; gateway CPU is not full-system CPU/memory overhead."
+  ]
+}

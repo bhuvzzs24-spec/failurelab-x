@@ -97,6 +97,9 @@ export const graph: Graph = {
   })),
 };
 export const overview: Overview = {
+  research_job_count: 0,
+  active_research_count: 0,
+  research_violation_count: 0,
   service_count: 4,
   experiment_count: 1,
   run_count: 7,

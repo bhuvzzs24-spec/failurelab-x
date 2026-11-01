@@ -311,12 +311,17 @@ function Builder({
           type="button"
           variant="secondary"
           disabled={save.isPending || start.isPending}
+          control="execute"
           onClick={handleSubmit((values) => save.mutate(values))}
         >
           <Save size={14} />
           {save.isPending ? "Saving…" : "Save new definition"}
         </Button>
-        <Button type="submit" disabled={start.isPending || save.isPending || !!invariants.error}>
+        <Button
+          control="execute"
+          type="submit"
+          disabled={start.isPending || save.isPending || !!invariants.error}
+        >
           <Play size={14} />
           {start.isPending ? "Submitting…" : "Review & run"}
         </Button>

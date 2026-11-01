@@ -126,6 +126,29 @@ export function Dashboard() {
           </div>
         ))}
       </div>
+      <Panel
+        title="Research activity"
+        subtitle="Persisted research jobs and deduplicated invariant signatures · refreshed from the backend"
+      >
+        <div className="research-summary">
+          <span>
+            <strong>{overview.research_job_count ?? "—"}</strong> research jobs
+          </span>
+          <span>
+            <strong>{overview.active_research_count ?? "—"}</strong> active research jobs
+          </span>
+          <span>
+            <strong>{overview.research_violation_count ?? "—"}</strong> research violation patterns
+          </span>
+          <Link href="/explorer">
+            Open adaptive explorer <ArrowRight size={14} />
+          </Link>
+        </div>
+        <p className="microcopy">
+          The four cards above describe the original experiment engine. Research findings are
+          counted separately to preserve their deduplication semantics.
+        </p>
+      </Panel>
       <div className="dashboard-primary">
         <Panel
           title="System topology"

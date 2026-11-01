@@ -16,6 +16,10 @@ class ProjectOverview(Contract):
     latest_runs: list[RunOut]
     latest_findings: list[FindingOut]
 
+    research_job_count: int = 0
+    active_research_count: int = 0
+    research_violation_count: int = 0
+
 class Capabilities(Contract):
     sandbox_id: str
     engine_version: str

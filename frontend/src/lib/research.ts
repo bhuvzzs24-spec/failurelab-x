@@ -24,3 +24,40 @@ export const research = {
   cancel: (job: string) =>
     request<ResearchJob>(`api/v1/research/jobs/${job}/cancel`, { method: "POST", body: "{}" }),
 };
+
+export async function evidenceBundle(jobId: string) {
+  const job = await request<ResearchJob>(`api/v1/research/jobs/${jobId}`);
+  const [trials, decisions, artifacts] = await Promise.all([
+    allPages<Trial>(`api/v1/research/jobs/${jobId}/trials`),
+    research.decisions(jobId),
+    research.artifacts(jobId),
+  ]);
+  const candidateId =
+    job.input.candidate_id ??
+    (typeof job.result.candidate_id === "string" ? job.result.candidate_id : null);
+  const candidate = candidateId
+    ? await request<Candidate>(`api/v1/research/candidates/${candidateId}`)
+    : null;
+  const sourceId = candidate?.source_trial_id ?? job.input.source_trial_id;
+  const sourceTrial = sourceId ? await request<Trial>(`api/v1/research/trials/${sourceId}`) : null;
+  const bundle = {
+    format: "failurelab-evidence-v1",
+    redacted: true,
+    job,
+    trials,
+    decisions,
+    artifacts,
+    candidate,
+    source_trial: sourceTrial,
+    complete: job.status === "COMPLETED",
+    limitations: [
+      "Bridge redacts secrets and local paths; artifact hashes identify original backend payloads.",
+      "A completed job may contain an infrastructure error or failed invariant; inspect outcomes.",
+    ],
+  };
+  if (new TextEncoder().encode(JSON.stringify(bundle)).length > 32 * 1024 * 1024)
+    throw new Error(
+      "Evidence exceeds the 32 MiB browser export limit. Retrieve paginated records through the authenticated API.",
+    );
+  return bundle;
+}

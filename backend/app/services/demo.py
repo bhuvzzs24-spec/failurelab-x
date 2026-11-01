@@ -66,7 +66,9 @@ def create_app(role: str | None = None, database_url: str | None = None):
             try: await task
             except asyncio.CancelledError: pass
         engine.dispose()
+    from app.core.limits import BodyLimit
     app=FastAPI(title="FailureLab demo "+role,lifespan=lifespan)
+    app.add_middleware(BodyLimit)
     from app.telemetry.logging import configure, instrument
     configure(); instrument(app)
     app.state.sessions=sessions

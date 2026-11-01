@@ -17,7 +17,13 @@ import {
 import { z } from "zod";
 import { toast } from "sonner";
 import { Play, Download, StopCircle, ShieldCheck, GitBranch } from "lucide-react";
-import { research, type ResearchCreate, type ResearchJob, type Trial } from "@/lib/research";
+import {
+  research,
+  evidenceBundle,
+  type ResearchCreate,
+  type ResearchJob,
+  type Trial,
+} from "@/lib/research";
 import { dateTime, shortId, asObject, asText } from "@/lib/utils";
 import { useProject } from "./providers";
 import { Button } from "./ui/button";
@@ -283,7 +289,13 @@ export function ResearchWorkspace({
     refetchInterval: 5000,
   });
   const candidates = useQuery({
-    queryKey: ["research-candidates", projectId],
+    queryKey: [
+      "research-candidates",
+      projectId,
+      jobs.data
+        ?.filter((j) => j.kind === "REPAIR" || j.kind === "VERIFY")
+        .map((j) => [j.id, j.status, j.updated_at]),
+    ],
     queryFn: () => research.candidates(projectId),
     refetchInterval: 5000,
   });
@@ -292,8 +304,9 @@ export function ResearchWorkspace({
     queryFn: research.capabilities,
   });
   const selected =
-    jobs.data?.find((j) => j.id === jobId) ??
-    jobs.data?.filter((j) => j.kind === kind).sort((a, b) => b.created_at - a.created_at)[0];
+    jobId
+      ? jobs.data?.find((j) => j.id === jobId)
+      : jobs.data?.filter((j) => j.kind === kind).sort((a, b) => b.created_at - a.created_at)[0];
   const decisions = useQuery({
     queryKey: ["research-decisions", selected?.id, selected?.status],
     queryFn: () => research.decisions(selected!.id),
@@ -311,15 +324,34 @@ export function ResearchWorkspace({
       ?.filter((t) => t.classification === "APPLICATION_VIOLATION" && t.variant === "original")
       .sort((a, b) => a.created_at - b.created_at) ?? [];
   const source = violations.find((t) => t.id === trialId) ?? violations.at(-1);
+  const recordedSource = selected?.input.source_trial_id
+    ? trials.data?.find((t) => t.id === selected.input.source_trial_id)
+    : source;
   const candidate = candidates.data?.find((c) => c.id === candidateId) ?? candidates.data?.[0];
+  const reviewedId =
+    kind === "REPAIR"
+      ? selected?.result.candidate_id
+      : kind === "VERIFY"
+        ? selected?.input.candidate_id
+        : null;
+  const reviewedCandidate =
+    typeof reviewedId === "string" ? candidates.data?.find((c) => c.id === reviewedId) : candidate;
   const start = useMutation({
     mutationFn: (body: ResearchCreate) => research.create(projectId, body),
     onSuccess: (j) => {
+      cache.setQueryData<ResearchJob[]>(["research-jobs", projectId], (previous = []) => [
+        j, ...previous.filter((row) => row.id !== j.id),
+      ]);
       setJobId(j.id);
       setPending(null);
       void cache.invalidateQueries({ queryKey: ["research-jobs", projectId] });
       toast.success("Research job queued");
     },
+    onError: (e) => toast.error(e.message),
+  });
+  const exportRecord = useMutation({
+    mutationFn: evidenceBundle,
+    onSuccess: (bundle) => downloadJson(bundle, `failurelab-evidence-${bundle.job.id}.json`),
     onError: (e) => toast.error(e.message),
   });
   const cancel = useMutation({
@@ -491,7 +523,7 @@ export function ResearchWorkspace({
               </select>
             </label>
           )}
-          <Button onClick={prepareJob} disabled={start.isPending}>
+          <Button control="execute" onClick={prepareJob} disabled={start.isPending}>
             <Play size={14} />
             {labels[kind]}
           </Button>
@@ -506,7 +538,8 @@ export function ResearchWorkspace({
         {kind === "BENCHMARK" && (
           <p className="microcopy">
             Runs random, coverage, and adaptive search using seeds 17, 42, 93 and the same budget
-            per pair, then six trusted reference comparisons. Every real HTTP trial consumes budget.
+            per pair, then separate held-out, witness, comparator and minimization controls.
+            Evaluation outcomes never train the planners. Every real HTTP trial consumes budget.
           </p>
         )}
       </Panel>
@@ -527,7 +560,11 @@ export function ResearchWorkspace({
             <Button variant="secondary" onClick={() => setPending(null)} disabled={start.isPending}>
               Back
             </Button>
-            <Button disabled={start.isPending} onClick={() => pending && start.mutate(pending)}>
+            <Button
+              control="execute"
+              disabled={start.isPending}
+              onClick={() => pending && start.mutate(pending)}
+            >
               Confirm sandbox execution
             </Button>
           </div>
@@ -563,7 +600,8 @@ export function ResearchWorkspace({
               </span>
               <Button
                 variant="secondary"
-                onClick={() => downloadJson(selected, `research-${selected.id}.json`)}
+                disabled={exportRecord.isPending}
+                onClick={() => exportRecord.mutate(selected.id)}
               >
                 <Download size={14} />
                 Export record
@@ -571,6 +609,7 @@ export function ResearchWorkspace({
               {active(selected.status) && (
                 <Button
                   variant="secondary"
+                  control="execute"
                   onClick={() => cancel.mutate(selected.id)}
                   disabled={cancel.isPending || selected.cancel_requested}
                 >
@@ -627,23 +666,23 @@ export function ResearchWorkspace({
           </details>
         </Panel>
       )}
-      {(kind === "REPAIR" || kind === "VERIFY") && candidate && (
+      {(kind === "REPAIR" || kind === "VERIFY") && reviewedCandidate && (
         <Panel
           title="Candidate source change"
           subtitle="Literal policy patch · isolated workspace · never merged"
         >
           <p className="microcopy">
-            <GitBranch size={14} /> {shortId(candidate.id)} · {candidate.status}
+            <GitBranch size={14} /> {shortId(reviewedCandidate.id)} · {reviewedCandidate.status}
           </p>
-          <PatchDiff patch={candidate.patch} />
+          <PatchDiff patch={reviewedCandidate.patch} />
           <details>
             <summary>Validation and provenance</summary>
-            <JsonView value={candidate.metadata} />
+            <JsonView value={reviewedCandidate.metadata} />
           </details>
         </Panel>
       )}
-      {source && ["MINIMIZE", "INVESTIGATE", "REPAIR"].includes(kind) && (
-        <TrialEvidence trial={source} />
+      {recordedSource && ["MINIMIZE", "INVESTIGATE", "REPAIR"].includes(kind) && (
+        <TrialEvidence trial={recordedSource} />
       )}
       {selected && (
         <Panel

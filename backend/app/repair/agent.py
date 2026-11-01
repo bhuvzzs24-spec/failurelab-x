@@ -24,21 +24,30 @@ class VerifyRequest(Contract):
     base_sha256: str=Field(pattern=r'^[a-f0-9]{64}$')
     runtime_sha256: str|None=Field(None,pattern=r'^[a-f0-9]{64}$')
 app=FastAPI(title='Restricted FailureLab repair agent')
+from app.core.limits import BodyLimit
+app.add_middleware(BodyLimit)
 lock=asyncio.Lock()
 @app.post('/verify',response_model=VerificationReport)
 async def verify(body:VerifyRequest,authorization:str=Header(default='')):
     token=os.getenv('REPAIR_AGENT_TOKEN','')
-    if not token or not hmac.compare_digest(authorization,'Bearer '+token): raise HTTPException(401,'invalid agent token')
+    if (os.getenv('AGENT_REQUIRE_STRONG_TOKEN')=='1' and len(token)<32) or not token or not hmac.compare_digest(authorization.encode(),('Bearer '+token).encode()): raise HTTPException(401,'invalid agent token')
     try: validate(body.source)
     except (ValueError,SyntaxError): raise HTTPException(422,'unsupported patch')
     if not shutil.which('docker'): return VerificationReport(outcome='INFRASTRUCTURE_ERROR',candidate_id=str(body.candidate_id),reason='Docker executable is unavailable.')
     if lock.locked(): raise HTTPException(409,'verification agent busy')
     async with lock:
         name='failurelab-verify-'+uuid.uuid4().hex
-        with tempfile.TemporaryDirectory(prefix='failurelab-agent-') as folder:
+        input_root=os.getenv('REPAIR_INPUT_ROOT')
+        if input_root: Path(input_root).mkdir(parents=True,exist_ok=True,mode=0o700)
+        with tempfile.TemporaryDirectory(prefix='failurelab-agent-',dir=input_root) as folder:
             path=Path(folder); path.chmod(0o755)
             (path/'input.json').write_text(body.model_dump_json()); (path/'input.json').chmod(0o444)
-            command=['docker','run','--name',name,'--rm','--network','none','--read-only','--cap-drop','ALL','--security-opt','no-new-privileges','--cpus','1','--memory','512m','--pids-limit','64','--user','10001:10001','--tmpfs','/tmp:rw,nosuid,nodev,size=128m,mode=1777','--mount','type=bind,src='+str(path/'input.json')+',dst=/input.json,readonly','failurelab-verifier:phase3']
+            host_file=path/'input.json'
+            host_root=os.getenv('REPAIR_HOST_INPUT_ROOT')
+            if host_root:
+                if not input_root or not Path(host_root).is_absolute() or ',' in host_root: raise HTTPException(503,'invalid agent input mount configuration')
+                host_file=Path(host_root)/path.relative_to(Path(input_root))/'input.json'
+            command=['docker','run','--name',name,'--rm','--network','none','--read-only','--cap-drop','ALL','--security-opt','no-new-privileges','--cpus','1','--memory','512m','--pids-limit','64','--user','10001:10001','--tmpfs','/tmp:rw,nosuid,nodev,size=128m,mode=1777','--mount','type=bind,src='+str(host_file)+',dst=/input.json,readonly','failurelab-verifier:phase3']
             process=None; inspect_process=None
             try:
                 inspect_process=await asyncio.create_subprocess_exec('docker','image','inspect','failurelab-verifier:phase3','--format','{{.Id}}',stdout=asyncio.subprocess.PIPE,stderr=asyncio.subprocess.DEVNULL)
@@ -61,3 +70,17 @@ async def verify(body:VerifyRequest,authorization:str=Header(default='')):
                 except asyncio.TimeoutError: cleanup.kill(); await cleanup.wait()
                 if process and process.returncode is None: process.kill(); await process.wait()
                 if inspect_process and inspect_process.returncode is None: inspect_process.kill(); await inspect_process.wait()
+
+
+@app.get('/health')
+async def health(authorization:str=Header(default='')):
+    token=os.getenv('REPAIR_AGENT_TOKEN','')
+    if not token or not hmac.compare_digest(authorization.encode(),('Bearer '+token).encode()):raise HTTPException(401,'invalid agent token')
+    if not shutil.which('docker'):raise HTTPException(503,'Docker unavailable')
+    process=await asyncio.create_subprocess_exec('docker','image','inspect','failurelab-verifier:phase3',stdout=asyncio.subprocess.DEVNULL,stderr=asyncio.subprocess.DEVNULL)
+    try:
+        await asyncio.wait_for(process.wait(),timeout=3)
+        if process.returncode:raise HTTPException(503,'verification image or daemon unavailable')
+    except asyncio.TimeoutError:
+        process.kill();await process.wait();raise HTTPException(503,'verification daemon timeout')
+    return {'status':'ready','execution_scope':'restricted local verification image'}

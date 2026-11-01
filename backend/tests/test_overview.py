@@ -41,3 +41,14 @@ def test_capabilities_match_real_engine_and_exclude_secrets(client):
     assert data["fault_targets"]==["payment"]
     assert not data["automatic_replay"] and not data["causal_analysis"]
     assert "token" not in str(data).lower() and "database_url" not in data
+
+def test_research_counts_are_not_silently_omitted(client,sessions):
+    from app.models.entities import Project
+    from app.models.research import ResearchJob
+    import time
+    project=client.post('/api/v1/projects',json={'name':'research-overview'}).json()['id']
+    with sessions.begin() as db:
+        db.add(ResearchJob(project_id=project,idempotency_key='overview',kind='SEARCH',status='QUEUED',deadline=time.time()+600,input={'kind':'SEARCH'},result={}))
+    result=client.get('/api/v1/projects/'+project+'/overview').json()
+    assert result['research_job_count']==1 and result['active_research_count']==1
+    assert result['research_violation_count']==0 and result['run_count']==0

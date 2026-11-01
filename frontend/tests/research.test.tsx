@@ -6,6 +6,7 @@ import userEvent from "@testing-library/user-event";
 import { beforeEach, expect, it, vi } from "vitest";
 vi.mock("@/components/providers", () => ({ useProject: () => ({ projectId: "project-test" }) }));
 vi.mock("@/lib/research", () => ({
+  evidenceBundle: vi.fn(),
   research: {
     jobs: vi.fn(),
     trials: vi.fn(),
@@ -155,4 +156,28 @@ it("shows an actual verification infrastructure error report", async () => {
   expect(await screen.findByLabelText("Verification outcome")).toHaveTextContent(
     "INFRASTRUCTURE_ERROR",
   );
+});
+
+it("selects the newly created execution without displaying an older completed verdict", async () => {
+  vi.mocked(research.jobs).mockResolvedValueOnce([{ ...job, id: "old", status: "COMPLETED" } as never]);
+  vi.mocked(research.jobs).mockImplementation(() => new Promise(() => {}));
+  vi.mocked(research.create).mockResolvedValue({ ...job, id: "new" } as never);
+  const user = userEvent.setup();
+  mount();
+  await user.click(await screen.findByRole("button", { name: "Start discovery" }));
+  await user.click(screen.getByRole("button", { name: "Confirm sandbox execution" }));
+  await waitFor(() => expect(screen.getByRole("combobox", { name: "Research job" })).toHaveValue("new"));
+  expect(screen.queryByText("COMPLETED", { exact: true })).not.toBeInTheDocument();
+  expect(screen.getByText("CREATED", { exact: true })).toBeVisible();
+});
+
+it("keeps a historical job's authoritative evidence tied to its recorded source", async () => {
+  vi.mocked(research.jobs).mockResolvedValue([{ ...job, kind: "INVESTIGATE", input: { ...job.input, source_trial_id: "recorded" } } as never]);
+  vi.mocked(research.trials).mockResolvedValue([
+    { id: "recorded", classification: "APPLICATION_VIOLATION", variant: "original", created_at: 1, scenario: { defect: "payment_ack_loss" }, evidence: {}, signature: "saved-signature" },
+    { id: "newer", classification: "APPLICATION_VIOLATION", variant: "original", created_at: 2, scenario: { defect: "unsafe_retry" }, evidence: {}, signature: "newer-signature" },
+  ] as never);
+  mount("ai");
+  expect(await screen.findByText(/Signature saved-signature/)).toBeVisible();
+  expect(screen.queryByText(/Signature newer-signature/)).not.toBeInTheDocument();
 });

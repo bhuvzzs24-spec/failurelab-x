@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from app.core.db import get_db
 from app.core.config import settings, ALLOWED_SERVICES
 from app.models.entities import Project, Service, Experiment, Run, Finding, Artifact
+from app.models.research import ResearchJob, ResearchFinding
 from app.schemas.contracts import Page, RunOut, FindingOut, Fault, ExperimentConfig
 from app.schemas.overview import ProjectOverview, ActivityPoint, Capabilities
 from app.api.routes import get
@@ -41,7 +42,9 @@ def overview(project_id:str,db:Session=Depends(get_db)):
     latest=list(db.scalars(select(Run).where(Run.experiment_id.in_(ids)).order_by(Run.created_at.desc(),Run.id).limit(12)))
     findings=list(db.scalars(select(Finding).join(Run,Finding.run_id==Run.id).where(Run.experiment_id.in_(ids)).order_by(Run.created_at.desc(),Finding.id).limit(8)))
     def count(model,predicate): return db.scalar(select(func.count()).select_from(model).where(predicate))
-    return ProjectOverview(service_count=count(Service,Service.project_id==project_id),
+    return ProjectOverview(research_job_count=count(ResearchJob,ResearchJob.project_id==project_id),
+        active_research_count=db.scalar(select(func.count()).select_from(ResearchJob).where(ResearchJob.project_id==project_id,ResearchJob.status.in_(['CREATED','QUEUED','RUNNING']))),
+        research_violation_count=count(ResearchFinding,ResearchFinding.project_id==project_id),service_count=count(Service,Service.project_id==project_id),
         experiment_count=count(Experiment,Experiment.project_id==project_id),run_count=sum(counts.values()),
         active_run_count=sum(value for key,value in counts.items() if key in ACTIVE),
         violation_count=count(Finding,Finding.run_id.in_(run_ids)),artifact_count=count(Artifact,Artifact.run_id.in_(run_ids)),

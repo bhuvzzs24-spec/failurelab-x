@@ -1,4 +1,5 @@
 "use client";
+import { useAccess } from "../access";
 import * as AlertDialog from "@radix-ui/react-alert-dialog";
 import { Button, buttonVariants } from "./button";
 export function Confirm({
@@ -18,6 +19,7 @@ export function Confirm({
   onConfirm: () => void;
   pending?: boolean;
 }) {
+  const access = useAccess();
   return (
     <AlertDialog.Root open={open} onOpenChange={onOpenChange}>
       <AlertDialog.Portal>
@@ -32,7 +34,7 @@ export function Confirm({
             </AlertDialog.Cancel>
             <AlertDialog.Action
               className={buttonVariants({ variant: "default" })}
-              disabled={pending}
+              disabled={pending || !access.can_execute}
               onClick={onConfirm}
             >
               {pending ? "Submitting…" : action}

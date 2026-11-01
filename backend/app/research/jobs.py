@@ -111,18 +111,8 @@ class ResearchRunner:
                 db.execute(update(RepairCandidate).where(RepairCandidate.id==config.candidate_id).values(status=result['outcome']))
             return result
         if config.kind=='BENCHMARK':
-            results=[]
-            for seed in config.seeds:
-                for strategy in ('random','coverage','adaptive'):
-                    selection=config.search.model_copy(update={'seed':seed,'strategy':strategy})
-                    results.append(await search(selection,execute,record,graph,invariants,history=[]))
-            references=[]
-            from app.benchmarks.catalog import witness
-            for defect in config.search.defects:
-                case=witness(defect); original=await execute(case); repeated=await execute(case); reference=await execute(case,'reference'); baseline=await execute(case.model_copy(update={'actions':[],'concurrency':1}))
-                references.append({'defect':defect,'original_trial_id':original['id'],'reference_trial_id':reference['id'],'original':original['classification'],'reference':reference['classification'],'repeat_trial_id':repeated['id'],'repeat_matches_signature':original['classification']=='APPLICATION_VIOLATION' and repeated['classification']=='APPLICATION_VIOLATION' and original['signature']==repeated['signature'],'baseline_trial_id':baseline['id'],'baseline':baseline['classification'],'reference_wall_delta_seconds':reference['cost_seconds']-original['cost_seconds']})
-            means={s:sum(r['unique_bugs'] for r in results if r['strategy']==s)/len(config.seeds) for s in ('random','coverage','adaptive')}
-            return {'comparisons':results,'mean_unique_bugs':means,'adaptive_improved_observed_mean':means['adaptive']>max(means['random'],means['coverage']),'reference_comparisons':references,'reference_comparison_note':'Trusted shipped reference policies; not execution or verification of generated candidate patches.','witness_reproduction_matches':sum(r['repeat_matches_signature'] for r in references),'witness_pairs':len(references),'unexpected_control_violations':sum(r[v]=='APPLICATION_VIOLATION' for r in references for v in ('baseline','reference')),'candidate_repair_verification_success':None,'candidate_repair_verification_note':'Reported by independent VERIFY jobs; reference policies are not generated candidate verification.','seeds':config.seeds,'budget_per_strategy_per_seed':config.search.budget,'limitations':['Small finite candidate space; no generalization claim.','False positives require external adjudication; not reported as zero.','Wall costs reflect this execution environment.']}
+            from app.benchmarks.study import study
+            return await study(config,execute,record,graph,invariants)
         raise ValueError('unsupported job')
 
 def recover_research(sessions=SessionLocal):

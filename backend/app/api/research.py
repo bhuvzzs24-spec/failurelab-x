@@ -66,3 +66,7 @@ def candidates(project_id:str,offset:int=Query(0,ge=0),limit:int=Query(50,ge=1,l
     return Page(items=[candidate_out(r) for r in db.scalars(select(RepairCandidate).where(*filters).order_by(RepairCandidate.created_at.desc()).offset(offset).limit(limit))],offset=offset,limit=limit,total=db.scalar(select(func.count()).select_from(RepairCandidate).where(*filters)))
 @router.get('/candidates/{candidate_id}',response_model=CandidateOut)
 def candidate(candidate_id:str,db:Session=Depends(get_db)): return candidate_out(get(db,RepairCandidate,candidate_id))
+
+@router.get('/jobs/{job_id}/trials',response_model=Page[TrialOut])
+def job_trials(job_id:str,offset:int=Query(0,ge=0),limit:int=Query(50,ge=1,le=100),db:Session=Depends(get_db)):
+    get(db,ResearchJob,job_id);return page(db,ResearchTrial,TrialOut,[ResearchTrial.job_id==job_id],offset,limit)

@@ -69,7 +69,9 @@ def create_app(role=None, database_url=None):
         Store.metadata.create_all(engine)
         yield
         engine.dispose()
+    from app.core.limits import BodyLimit
     app=FastAPI(title='FailureLab managed benchmark '+role,lifespan=lifespan)
+    app.add_middleware(BodyLimit)
     token=os.getenv('CONTROL_TOKEN','local-control-token')
     async def auth(x_control_token: str=Header(default='')):
         if not hmac.compare_digest(x_control_token,token): raise HTTPException(401,'invalid sandbox token')

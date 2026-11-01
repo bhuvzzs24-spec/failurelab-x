@@ -120,3 +120,58 @@ it("blocks DNS-rebinding hosts even when Origin matches", async () => {
   expect((await bridge(request, ["api", "v1", "projects"], env)).status).toBe(403);
   expect(fetcher).not.toHaveBeenCalled();
 });
+
+it("allows only an explicitly configured public read-only origin and HTTPS backend", async () => {
+  const fetcher = vi.fn().mockResolvedValue(Response.json({ items: [] }));
+  vi.stubGlobal("fetch", fetcher);
+  const hosted = {
+    API_TOKEN: "viewer-unit-token",
+    ACCESS_MODE: "read_only",
+    PUBLIC_FRONTEND_ORIGIN: "https://lab.example",
+    BACKEND_URL: "https://records.example",
+    HOSTED_BACKEND_ORIGIN: "https://records.example",
+  };
+  const read = new Request("https://lab.example/api/backend/api/v1/projects");
+  expect((await bridge(read, ["api", "v1", "projects"], hosted)).status).toBe(200);
+  expect(fetcher.mock.calls[0][0].origin).toBe("https://records.example");
+  fetcher.mockClear();
+  const write = new Request("https://lab.example/api/backend/api/v1/projects", {
+    method: "POST",
+    headers: { origin: "https://lab.example", "content-type": "application/json" },
+    body: "{}",
+  });
+  expect((await bridge(write, ["api", "v1", "projects"], hosted)).status).toBe(403);
+  expect(fetcher).not.toHaveBeenCalled();
+  expect((await bridge(new Request("https://evil.example/test"), ["health"], hosted)).status).toBe(
+    403,
+  );
+  expect(
+    (
+      await bridge(read, ["api", "v1", "projects"], {
+        ...hosted,
+        HOSTED_BACKEND_ORIGIN: "https://other.example",
+      })
+    ).status,
+  ).toBe(503);
+});
+it("retains safe rate-limit metadata without forwarding arbitrary headers", async () => {
+  vi.stubGlobal(
+    "fetch",
+    vi
+      .fn()
+      .mockResolvedValue(
+        Response.json(
+          { error: { message: "limited" } },
+          { status: 429, headers: { "Retry-After": "60", "Set-Cookie": "secret=value" } },
+        ),
+      ),
+  );
+  const response = await bridge(
+    new Request("http://localhost/test"),
+    ["api", "v1", "projects"],
+    env,
+  );
+  expect(response.status).toBe(429);
+  expect(response.headers.get("retry-after")).toBe("60");
+  expect(response.headers.get("set-cookie")).toBeNull();
+});

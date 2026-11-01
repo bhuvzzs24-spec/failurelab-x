@@ -4,6 +4,7 @@ import type { Project } from "@/types/domain";
 import { QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-query";
 import { createContext, useContext, useEffect, useState } from "react";
 import { Toaster } from "sonner";
+import { AccessProvider } from "./access";
 
 type ProjectContextValue = {
   projects: Project[];
@@ -49,7 +50,13 @@ export function useProject() {
   if (!context) throw new Error("Project provider is missing");
   return context;
 }
-export function Providers({ children }: { children: React.ReactNode }) {
+export function Providers({
+  children,
+  readOnly = false,
+}: {
+  children: React.ReactNode;
+  readOnly?: boolean;
+}) {
   useEffect(() => {
     document.documentElement.dataset.contrast =
       localStorage.getItem("failurelab.contrast") ?? "standard";
@@ -70,7 +77,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
   );
   return (
     <QueryClientProvider client={client}>
-      <Projects>{children}</Projects>
+      <AccessProvider readOnly={readOnly}>
+        <Projects>{children}</Projects>
+      </AccessProvider>
       <Toaster theme="dark" richColors position="bottom-right" />
     </QueryClientProvider>
   );

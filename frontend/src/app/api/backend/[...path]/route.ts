@@ -4,3 +4,5 @@ export async function GET(request: Request, context: { params: Promise<{ path: s
   return bridge(request, (await context.params).path);
 }
 export const POST = GET;
+
+export const maxDuration = 15;

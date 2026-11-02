@@ -9,7 +9,6 @@ import {
   BookOpen,
   Box,
   ChevronLeft,
-  Command,
   FlaskConical,
   GitBranch,
   Layers3,
@@ -29,19 +28,19 @@ import { useProject } from "./providers";
 import { Button } from "./ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "./ui/dialog";
 export const navigation = [
-  { href: "/", label: "Command center", icon: Layers3, group: "WORKSPACE" },
+  { href: "/", label: "Command center", icon: Layers3, group: "OBSERVE" },
   { href: "/graph", label: "System graph", icon: GitBranch },
   { href: "/experiments", label: "Experiment studio", icon: FlaskConical },
   { href: "/findings", label: "Failure investigator", icon: Search },
   { href: "/evidence", label: "Evidence explorer", icon: Box },
   { href: "/replay", label: "Failure replay", icon: Workflow },
-  { href: "/explorer", label: "Adaptive explorer", icon: FlaskConical, group: "RESEARCH" },
-  { href: "/ai", label: "AI investigator", icon: Sparkles, group: "INTELLIGENCE" },
+  { href: "/explorer", label: "Adaptive explorer", icon: FlaskConical, group: "DISCOVER" },
+  { href: "/ai", label: "AI investigator", icon: Sparkles, group: "INVESTIGATE" },
   { href: "/minimization", label: "Minimal sequence", icon: Activity },
   { href: "/verification", label: "Fix verification lab", icon: ShieldCheck },
   { href: "/patches", label: "Patch review", icon: GitBranch },
   { href: "/benchmarks", label: "Benchmarks", icon: Activity },
-  { href: "/settings", label: "Settings", icon: Settings2, group: "CONFIGURATION" },
+  { href: "/settings", label: "Settings", icon: Settings2, group: "WORKSPACE" },
 ];
 export function Shell({ children }: { children: React.ReactNode }) {
   const access = useAccess();
@@ -76,6 +75,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener("keydown", handle);
   }, []);
   const current = navigation.find((entry) => entry.href === path);
+  const backendReady = ready.data?.status === "ready" && !ready.isError && !health.isError;
   return (
     <div className={cn("app-shell", collapsed && "sidebar-collapsed", mobile && "mobile-open")}>
       <a href="#main-content" className="skip-link">
@@ -91,7 +91,9 @@ export function Shell({ children }: { children: React.ReactNode }) {
       <aside className="sidebar" aria-label="Primary navigation">
         <Link href="/" className="brand">
           <span className="brand-symbol">
-            <FlaskConical size={20} />
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M5 5h5l4 7-4 7H5l4-7-4-7Zm9 0h5l-4 7 4 7h-5l-4-7 4-7Z" fill="currentColor" />
+            </svg>
           </span>
           <span className="brand-wordmark">
             FailureLab <b>X</b>
@@ -106,7 +108,8 @@ export function Shell({ children }: { children: React.ReactNode }) {
         >
           <span className="workspace-avatar">FL</span>
           <span className="workspace-name">
-            Engineering workspace<small>Local sandbox</small>
+            Engineering workspace
+            <small>{access.read_only ? "Read-only demonstration" : "Controlled environment"}</small>
           </span>
           <ChevronLeft className="workspace-chevron" size={14} />
         </button>
@@ -129,9 +132,9 @@ export function Shell({ children }: { children: React.ReactNode }) {
         </nav>
         <div className="sidebar-bottom">
           <div className="sandbox-note">
-            <span className="status-dot" />
+            <ShieldCheck size={16} />
             <span>
-              Sandbox isolation<small>Managed demo targets only</small>
+              Execution boundary<small>Allowlisted sandbox targets</small>
             </span>
           </div>
           <a
@@ -167,7 +170,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
               <Menu size={19} />
             </Button>
             <span className="breadcrumb">
-              Workspace <span>/</span> <strong>{current?.label ?? "FailureLab X"}</strong>
+              Platform <span>/</span> <strong>{current?.label ?? "FailureLab X"}</strong>
             </span>
           </div>
           <div className="topbar-actions">
@@ -196,7 +199,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
             <span
               className={cn(
                 "connection-indicator",
-                health.isError ? "offline" : ready.data ? "ready" : "pending",
+                health.isError ? "offline" : backendReady ? "ready" : "pending",
               )}
               title={
                 ready.isError ? "API reachable; database or broker not ready" : "Backend connection"
@@ -207,17 +210,20 @@ export function Shell({ children }: { children: React.ReactNode }) {
                 ? "Connecting"
                 : health.isError
                   ? "API offline"
-                  : ready.data
+                  : backendReady
                     ? "Backend ready"
                     : "API connected"}
             </span>
             <Button
               variant="ghost"
-              size="icon"
+              size="sm"
+              className="command-trigger"
               aria-label="Open command palette"
               onClick={() => setCommand(true)}
             >
-              <Command size={16} />
+              <Search size={15} />
+              <span>Jump to…</span>
+              <kbd>⌘ K</kbd>
             </Button>
             <span className="operator-avatar" title={`Access role: ${access.role}`}>
               {access.role === "admin"
@@ -237,11 +243,11 @@ export function Shell({ children }: { children: React.ReactNode }) {
         <footer className="app-footer">
           <span>
             <SquareTerminal size={12} /> FAILURELAB X{" "}
-            <span className="footer-version">PHASE 4</span>
+            <span className="footer-version">RELIABILITY PLATFORM</span>
           </span>
           <span>
-            Evidence over assumptions <span className="footer-separator">·</span> Local execution
-            only
+            Evidence over assumptions <span className="footer-separator">·</span>{" "}
+            {access.read_only ? "Read-only access" : "Controlled experiments"}
           </span>
         </footer>
       </div>

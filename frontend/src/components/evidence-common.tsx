@@ -2,15 +2,47 @@
 import { useRuns } from "@/hooks/data";
 import { asObject, asText, dateTime, shortId } from "@/lib/utils";
 import type { Artifact } from "@/types/domain";
-import { Download } from "lucide-react";
+import { toast } from "sonner";
+import { Download, Copy, CheckCheck } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { useProject } from "./providers";
 import { Button } from "./ui/button";
 export function JsonView({ value, label = "JSON evidence" }: { value: unknown; label?: string }) {
+  const text = JSON.stringify(value, null, 2) ?? "No value recorded";
   return (
     <pre className="json-view" tabIndex={0} aria-label={label}>
-      <code>{JSON.stringify(value, null, 2) ?? "No value recorded"}</code>
+      <code>
+        {text.split("\n").map((line, i) => (
+          <span className="json-line" key={i}>
+            <span className="json-line-number" aria-hidden="true">
+              {i + 1}
+            </span>
+            <span>
+              {line
+                .split(/("(?:[^"\\]|\\.)*"\s*:?)|\b(true|false|null)\b|(-?\b\d+(?:\.\d+)?\b)/g)
+                .filter((part) => part !== undefined && part !== "")
+                .map((part, j) => (
+                  <span
+                    key={j}
+                    className={
+                      part.startsWith('"')
+                        ? part.trimEnd().endsWith(":")
+                          ? "json-key"
+                          : "json-string"
+                        : /^-?\d|true|false|null$/.test(part)
+                          ? "json-scalar"
+                          : undefined
+                    }
+                  >
+                    {part}
+                  </span>
+                ))}
+            </span>
+            {"\n"}
+          </span>
+        ))}
+      </code>
     </pre>
   );
 }
@@ -25,6 +57,19 @@ export function downloadJson(value: unknown, filename: string) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 export function ArtifactView({ artifact }: { artifact: Artifact }) {
+  const [view, setView] = useState("payload");
+  const [copied, setCopied] = useState(false);
+  async function copy() {
+    try {
+      await navigator.clipboard.writeText(
+        JSON.stringify(view === "payload" ? artifact.payload : artifact, null, 2),
+      );
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      toast.error("Clipboard is unavailable. Use Download JSON to export the record.");
+    }
+  }
   return (
     <div className="artifact-detail">
       <div className="artifact-detail-heading">
@@ -41,7 +86,27 @@ export function ArtifactView({ artifact }: { artifact: Artifact }) {
           Download JSON
         </Button>
       </div>
-      <dl className="detail-list compact">
+      <div className="inspector-navigation">
+        <div aria-label="Artifact views">
+          <button aria-pressed={view === "payload"} onClick={() => setView("payload")}>
+            Payload
+          </button>
+          <button aria-pressed={view === "metadata"} onClick={() => setView("metadata")}>
+            Metadata & integrity
+          </button>
+        </div>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => {
+            void copy();
+          }}
+        >
+          {copied ? <CheckCheck size={13} /> : <Copy size={13} />}
+          {copied ? "Copied" : "Copy JSON"}
+        </Button>
+      </div>
+      <dl className="detail-list compact" hidden={view !== "metadata"}>
         <div>
           <dt>Recorded</dt>
           <dd>{dateTime(artifact.created_at)}</dd>
@@ -59,7 +124,12 @@ export function ArtifactView({ artifact }: { artifact: Artifact }) {
         Secret values and local paths are redacted before display and download. The hash identifies
         the original backend payload, not this redacted representation.
       </p>
-      <JsonView value={artifact.payload} label="Artifact payload" />
+      {view === "payload" && <JsonView value={artifact.payload} label="Artifact payload" />}
+      <div className="artifact-integrity">
+        <CheckCheck size={13} />
+        <span>Original SHA-256 recorded</span>
+        <code>{artifact.sha256.slice(0, 16)}…</code>
+      </div>
     </div>
   );
 }

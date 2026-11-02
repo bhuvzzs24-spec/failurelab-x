@@ -37,6 +37,7 @@ jobs:
       # No sample services, fault proxies, workers, or candidate containers execute.
       - run: python scripts/test_ci.py
       - run: python scripts/check_secrets.py
+      - run: python scripts/validate_cloud.py
   frontend:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
@@ -52,6 +53,8 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run build
+      - run: node scripts/check_client_api.mjs
+        working-directory: .
       - run: npm audit --audit-level=high
   python-dependency-audit:
     runs-on: ubuntu-24.04

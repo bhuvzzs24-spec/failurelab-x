@@ -125,7 +125,7 @@ it("allows only an explicitly configured public read-only origin and HTTPS backe
   const fetcher = vi.fn().mockResolvedValue(Response.json({ items: [] }));
   vi.stubGlobal("fetch", fetcher);
   const hosted = {
-    API_TOKEN: "viewer-unit-token",
+    API_TOKEN: "viewer-unit-token".padEnd(40, "x"),
     ACCESS_MODE: "read_only",
     PUBLIC_FRONTEND_ORIGIN: "https://lab.example",
     BACKEND_URL: "https://records.example",

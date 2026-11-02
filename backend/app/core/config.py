@@ -15,9 +15,14 @@ class Settings:
     order: str = os.getenv("ORDER_URL", "http://order:8000")
     payment: str = os.getenv("PAYMENT_URL", "http://payment:8000")
     inventory: str = os.getenv("INVENTORY_URL", "http://inventory:8000")
-    version: str = os.getenv("BUILD_VERSION", "development")
+    version: str = os.getenv("BUILD_VERSION", os.getenv("RENDER_GIT_COMMIT", "development"))
 
     def __post_init__(self):
+        # Managed providers commonly supply URLs without SQLAlchemy's driver suffix.
+        for prefix in ("postgres://", "postgresql://"):
+            if self.database_url.startswith(prefix):
+                object.__setattr__(self,"database_url","postgresql+psycopg://"+self.database_url[len(prefix):])
+                break
         from urllib.parse import urlsplit
         if self.sandbox != "demo": raise ValueError("Phase 1 supports only the managed demo sandbox")
         for field in ("gateway","proxy","proxy_control","order","payment","inventory"):

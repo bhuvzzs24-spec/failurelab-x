@@ -20,4 +20,8 @@ export const asObject = (value: unknown): Record<string, unknown> =>
     ? (value as Record<string, unknown>)
     : {};
 export const asText = (value: unknown, fallback = "Not recorded") =>
-  typeof value === "string" ? value : fallback;
+  typeof value === "string"
+    ? value
+    : typeof value === "number" && Number.isFinite(value)
+      ? String(value)
+      : fallback;

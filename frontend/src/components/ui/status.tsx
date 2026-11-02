@@ -1,12 +1,22 @@
 import { cn } from "@/lib/utils";
 export function StatusBadge({ status, small = false }: { status: string; small?: boolean }) {
-  const tone = ["COMPLETED", "PASS"].includes(status)
+  const tone = [
+    "COMPLETED",
+    "PASS",
+    "NO_VIOLATION",
+    "SUPPORTED",
+    "PATCH_PASSES_TESTED_SCENARIOS",
+  ].includes(status)
     ? "success"
-    : ["FAIL", "FAILED"].includes(status)
+    : ["FAIL", "FAILED", "APPLICATION_VIOLATION", "REFUTED", "PATCH_FAILS_VERIFICATION"].includes(
+          status,
+        )
       ? "critical"
       : ["RUNNING", "VERIFYING"].includes(status)
         ? "active"
-        : ["INCONCLUSIVE", "CANCELLED"].includes(status)
+        : ["INCONCLUSIVE", "CANCELLED", "INFRASTRUCTURE_ERROR", "INJECTION_NOT_OBSERVED"].includes(
+              status,
+            )
           ? "warning"
           : "neutral";
   return (

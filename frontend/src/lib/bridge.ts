@@ -1,3 +1,4 @@
+import { cloudConfiguration } from "./cloud-config";
 import { redact } from "@/lib/redact";
 
 const id = "[a-zA-Z0-9_-]+";
@@ -67,7 +68,8 @@ export async function bridge(
   }
   const readOnly = env.ACCESS_MODE === "read_only";
   const local = ["127.0.0.1", "localhost", "[::1]"].includes(browserOrigin.hostname);
-  if (!local) {
+  const cloud = env.DEPLOYMENT_ENV === "cloud" || env.VERCEL === "1" || !local;
+  if (cloud) {
     try {
       const configured = new URL(env.PUBLIC_FRONTEND_ORIGIN ?? "");
       if (
@@ -84,6 +86,11 @@ export async function bridge(
     } catch {
       return error(403, "Only the configured read-only public frontend host is allowed");
     }
+    try {
+      cloudConfiguration(env);
+    } catch {
+      return error(503, "Cloud API connection is not safely configured");
+    }
   }
   if (readOnly && request.method !== "GET")
     return error(403, "Read-only demonstration: mutations are disabled");
@@ -95,6 +102,7 @@ export async function bridge(
   try {
     upstream = new URL(env.BACKEND_URL ?? "http://127.0.0.1:8000");
     const localUpstream =
+      !cloud &&
       upstream.protocol === "http:" &&
       ["127.0.0.1", "localhost", "[::1]", "api"].includes(upstream.hostname);
     const hostedUpstream =
@@ -109,7 +117,7 @@ export async function bridge(
     )
       throw new Error();
   } catch {
-    return error(503, "Server backend origin must be an allowed local HTTP origin");
+    return error(503, "Server backend origin is not authorized");
   }
   upstream.pathname = `/${path}`;
   for (const [key, value] of incoming.searchParams) {
@@ -183,7 +191,7 @@ export async function bridge(
   } catch {
     return error(
       502,
-      "Cannot reach the local backend. Check the API service and server configuration.",
+      "Cannot reach the configured backend. Check API readiness and server configuration.",
     );
   }
 }

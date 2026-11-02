@@ -30,9 +30,9 @@ const titles: Record<Section, { eyebrow: string; title: string; description: str
     description: "Compare discovery strategies under equal budgets and repeated seeds.",
   },
   home: {
-    eyebrow: "YOUR SYSTEM, UNDER A MICROSCOPE",
+    eyebrow: "SYSTEM RELIABILITY / OVERVIEW",
     title: "Command center",
-    description: "Explore the boundaries. Surface the failures. Trust the evidence.",
+    description: "A complete view of your architecture, experiments and correctness evidence.",
   },
   graph: {
     eyebrow: "DEPENDENCY INTELLIGENCE",
@@ -40,7 +40,7 @@ const titles: Record<Section, { eyebrow: string; title: string; description: str
     description: "An explicit model of your services and the boundaries between them.",
   },
   experiments: {
-    eyebrow: "CONTROLLED CHAOS. MEASURABLE OUTCOMES.",
+    eyebrow: "EXPERIMENT WORKBENCH",
     title: "Experiment studio",
     description: "Turn a failure scenario into a bounded, verifiable experiment.",
   },
@@ -50,27 +50,27 @@ const titles: Record<Section, { eyebrow: string; title: string; description: str
     description: "See what happened, what was expected, and what remains unknown.",
   },
   evidence: {
-    eyebrow: "THE RECORD OF WHAT ACTUALLY HAPPENED",
+    eyebrow: "OBSERVATIONS / PROVENANCE",
     title: "Evidence explorer",
     description: "Search state snapshots, evaluations, fault schedules, and execution artifacts.",
   },
   replay: {
-    eyebrow: "REPRODUCIBILITY, WITH HONEST LIMITS",
+    eyebrow: "REPRODUCTION WORKSPACE",
     title: "Failure replay",
     description: "Inspect original inputs and recorded instructions before repeating a scenario.",
   },
   ai: {
-    eyebrow: "PHASE 3 WORKSPACE",
+    eyebrow: "CAUSAL INVESTIGATION",
     title: "AI investigator",
     description: "Test competing hypotheses with paired controlled interventions.",
   },
   minimization: {
-    eyebrow: "PHASE 3 WORKSPACE",
+    eyebrow: "COUNTEREXAMPLE REDUCTION",
     title: "Minimal failure sequence",
     description: "Reduce observed failures through repeated, signature-preserving trials.",
   },
   verification: {
-    eyebrow: "PHASE 3 WORKSPACE",
+    eyebrow: "INDEPENDENT VERIFICATION",
     title: "Fix verification lab",
     description: "Compare original and candidate versions in the restricted verification sandbox.",
   },
@@ -158,6 +158,25 @@ export function Workspace({ section }: { section: Section }) {
           )}
         </div>
       </div>
+      {["explorer", "minimization", "ai", "patches", "verification", "benchmarks"].includes(
+        section,
+      ) && (
+        <nav className="research-route-tabs" aria-label="Research workflow">
+          {[
+            ["explorer", "01", "Discover"],
+            ["minimization", "02", "Reduce"],
+            ["ai", "03", "Investigate"],
+            ["patches", "04", "Prepare fix"],
+            ["verification", "05", "Verify"],
+            ["benchmarks", "06", "Benchmark"],
+          ].map(([path, number, label]) => (
+            <Link key={path} href={`/${path}`} aria-current={section === path ? "page" : undefined}>
+              <span>{number}</span>
+              {label}
+            </Link>
+          ))}
+        </nav>
+      )}
       {content}
     </>
   );

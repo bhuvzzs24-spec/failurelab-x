@@ -22,6 +22,9 @@ test("real registered demo → graph → controlled experiment → finding → e
   await expect(page.getByRole("heading", { name: "payment service", exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Close dialog", exact: true }).click();
   await page.getByRole("link", { name: "Experiment studio", exact: true }).click();
+  for (let step = 0; step < 3; step++)
+    await page.getByRole("button", { name: "Continue", exact: true }).click();
+  await expect(page.getByLabel("Experiment scope review")).toContainText("payment");
   await page.getByRole("button", { name: "Review & run", exact: true }).click();
   await expect(page.getByRole("alertdialog")).toContainText("Target: payment");
   await page.getByRole("button", { name: "Start sandbox experiment", exact: true }).click();

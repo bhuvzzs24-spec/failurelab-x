@@ -1,5 +1,5 @@
 "use client";
-import { useExperiments, useInvariants, useRuns } from "@/hooks/data";
+import { useExperiments, useInvariants, useRuns, useGraph } from "@/hooks/data";
 import { api } from "@/lib/api";
 import { asObject, asText, dateTime, shortId } from "@/lib/utils";
 import {
@@ -67,6 +67,10 @@ function Builder({
 }) {
   const { projectId, projects } = useProject();
   const invariants = useInvariants(projectId);
+  const graph = useGraph(projectId);
+  const [step, setStep] = useState(0);
+  const [furthest, setFurthest] = useState(0);
+  const [accepted, setAccepted] = useState<Run | null>(null);
   const client = useQueryClient();
   const [review, setReview] = useState<DefinitionValues | null>(null);
   const key = useRef<string | null>(null);
@@ -122,197 +126,374 @@ function Builder({
       void client.invalidateQueries({ queryKey: ["experiments", projectId] });
       void client.invalidateQueries({ queryKey: ["runs", projectId] });
       void client.invalidateQueries({ queryKey: ["overview", projectId] });
+      setAccepted(run);
+      setStep(4);
+      setFurthest(4);
       onRun(run);
     },
     onError: (error) => toast.error(error.message),
   });
+  const steps = [
+    "Select target",
+    "Configure fault",
+    "Select invariants",
+    "Review experiment",
+    "Execute & monitor",
+  ];
+  const revealInvalid = (issues: typeof errors) =>
+    setStep(issues.name ? 0 : issues.config?.fault ? 1 : 2);
+  async function nextStep() {
+    const valid =
+      step === 0
+        ? await form.trigger("name")
+        : step === 1
+          ? await form.trigger([
+              "config.fault.kind",
+              "config.fault.phase",
+              "config.fault.delay_seconds",
+              "config.fault.duration_seconds",
+            ])
+          : await form.trigger();
+    if (valid) {
+      setStep(Math.min(step + 1, 3));
+      setFurthest(Math.max(furthest, Math.min(step + 1, 3)));
+    }
+  }
+  const values = form.getValues();
+  const target = graph.data?.nodes.find((service) => service.name === "payment");
   return (
     <form
-      onSubmit={handleSubmit((values) => setReview(values))}
+      onSubmit={handleSubmit((values) => setReview(values), revealInvalid)}
       noValidate
       className="experiment-form"
     >
-      <div className="form-section-label">
-        <span>01</span>Experiment definition
+      <ol className="wizard-steps" aria-label="Experiment setup steps">
+        {steps.map((label, index) => (
+          <li
+            key={label}
+            className={
+              step === index ? "wizard-current" : index <= furthest ? "wizard-visited" : ""
+            }
+          >
+            <button
+              type="button"
+              aria-current={step === index ? "step" : undefined}
+              disabled={index > furthest}
+              onClick={() => setStep(index)}
+            >
+              <span>{String(index + 1).padStart(2, "0")}</span>
+              <strong>{label}</strong>
+            </button>
+          </li>
+        ))}
+      </ol>
+      <div className="wizard-stage-heading">
+        <span className="eyebrow">STEP {step + 1} OF 5</span>
+        <h3>{steps[step]}</h3>
+        <p>
+          {
+            [
+              "Give this experiment a name and choose an authorized service boundary.",
+              "Define exactly how and for how long the boundary should fail.",
+              "Choose the business guarantees this experiment must verify.",
+              "Review the bounded scope before any fault is activated.",
+              "The backend owns execution. Inspect its live lifecycle in the monitor.",
+            ][step]
+          }
+        </p>
       </div>
-      <FormField label="Experiment name" error={errors.name?.message}>
-        <input
-          {...register("name")}
-          aria-invalid={!!errors.name}
-          placeholder="Name this experiment"
-        />
-      </FormField>
-      <div className="form-section-label">
-        <span>02</span>Controlled fault
-      </div>
-      <div className="notice notice-neutral">
-        <ShieldCheck size={16} />
-        <div>
-          <strong>Managed demo boundary</strong>
-          <span>
-            Only the registered payment service is an allowed fault target. Every run resets the
-            demo under an exclusive sandbox lease.
+      <fieldset className="wizard-section" hidden={step !== 0}>
+        <legend className="sr-only">Target and definition</legend>
+        <FormField label="Experiment name" error={errors.name?.message}>
+          <input
+            {...register("name")}
+            aria-invalid={!!errors.name}
+            placeholder="Name this experiment"
+          />
+        </FormField>
+        <label className="wizard-target-card">
+          <input type="radio" value="payment" {...register("config.fault.target")} />
+          <span className="wizard-target-icon">
+            <FlaskConical size={20} />
           </span>
+          <span>
+            <strong>Payment service</strong>
+            <small>
+              {target
+                ? target.version
+                : graph.isPending
+                  ? "Checking registered services…"
+                  : "Service registration unavailable"}
+            </small>
+          </span>
+          <span className="subtle-chip">Allowlisted</span>
+        </label>
+        <p className="microcopy">
+          The current engine supports the registered payment boundary. Other targets cannot be
+          injected through this interface.
+        </p>
+      </fieldset>
+      <fieldset className="wizard-section" hidden={step !== 1}>
+        <legend className="sr-only">Fault parameters</legend>
+        <div className="notice notice-neutral">
+          <ShieldCheck size={16} />
+          <div>
+            <strong>Managed demo boundary</strong>
+            <span>
+              Only the registered payment service is an allowed fault target. Every run resets the
+              demo under an exclusive sandbox lease.
+            </span>
+          </div>
         </div>
-      </div>
-      <input type="hidden" {...register("config.fault.target")} />
-      <div className="form-grid">
-        <FormField label="Fault type" error={errors.config?.fault?.kind?.message}>
-          <select {...register("config.fault.kind")}>
-            {faultKinds.map((kind) => (
-              <option key={kind} value={kind}>
-                {kind.replaceAll("_", " ")}
-              </option>
-            ))}
-          </select>
-        </FormField>
-        <FormField label="Injection phase" error={errors.config?.fault?.phase?.message}>
-          <select {...register("config.fault.phase")}>
-            <option value="after">After upstream response</option>
-            <option value="before">Before forwarding</option>
-          </select>
-        </FormField>
-        <FormField
-          label="HTTP delay (seconds)"
-          error={errors.config?.fault?.delay_seconds?.message}
-          hint="Applies to latency faults; maximum 10 seconds."
-        >
-          <input
-            type="number"
-            min="0"
-            max="10"
-            step="0.1"
-            {...register("config.fault.delay_seconds", { valueAsNumber: true })}
-          />
-        </FormField>
-        <FormField
-          label="Fault lease TTL (seconds)"
-          error={errors.config?.fault?.duration_seconds?.message}
-          hint="Expires independently of the experiment worker."
-        >
-          <input
-            type="number"
-            min="1"
-            max="30"
-            step="0.5"
-            {...register("config.fault.duration_seconds", { valueAsNumber: true })}
-          />
-        </FormField>
-      </div>
-      <div className="form-section-label">
-        <span>03</span>Executable invariants
-      </div>
-      {invariants.error ? (
-        <p className="inline-error" role="alert">
-          Cannot load registered invariants: {invariants.error.message}
-        </p>
-      ) : invariants.isPending ? (
-        <p className="muted">Loading invariants…</p>
-      ) : !invariants.data.length ? (
-        <p className="muted">
-          No registered invariants. Seed the demo or register a rule in settings before running.
-        </p>
-      ) : (
-        <div className="invariant-options">
-          {invariants.data.map((invariant) => (
-            <label key={invariant.id}>
-              <input type="checkbox" value={invariant.id} {...register("config.invariant_ids")} />
-              <span>
-                <strong>{invariant.name}</strong>
-                <small>
-                  {invariant.rule.kind} · {shortId(invariant.id)}
-                </small>
-              </span>
-              <ShieldCheck size={16} />
-            </label>
-          ))}
-        </div>
-      )}
-      {errors.config?.invariant_ids && (
-        <p className="field-error" role="alert">
-          {errors.config.invariant_ids.message}
-        </p>
-      )}
-      <details className="advanced-config">
-        <summary>
-          <SlidersHorizontal size={14} />
-          Consistency window & workflow inputs
-          <ChevronDown size={14} />
-        </summary>
         <div className="form-grid">
-          <FormField
-            label="Maximum duration (seconds)"
-            error={errors.config?.max_duration_seconds?.message}
-          >
-            <input
-              type="number"
-              min="10"
-              max="90"
-              {...register("config.max_duration_seconds", { valueAsNumber: true })}
-            />
+          <FormField label="Fault type" error={errors.config?.fault?.kind?.message}>
+            <select {...register("config.fault.kind")}>
+              {faultKinds.map((kind) => (
+                <option key={kind} value={kind}>
+                  {kind.replaceAll("_", " ")}
+                </option>
+              ))}
+            </select>
+          </FormField>
+          <FormField label="Injection phase" error={errors.config?.fault?.phase?.message}>
+            <select {...register("config.fault.phase")}>
+              <option value="after">After upstream response</option>
+              <option value="before">Before forwarding</option>
+            </select>
           </FormField>
           <FormField
-            label="Consistency window (seconds)"
-            error={errors.config?.consistency_seconds?.message}
+            label="HTTP delay (seconds)"
+            error={errors.config?.fault?.delay_seconds?.message}
+            hint="Applies to latency faults; maximum 10 seconds."
           >
             <input
               type="number"
               min="0"
-              max="15"
-              step="0.1"
-              {...register("config.consistency_seconds", { valueAsNumber: true })}
-            />
-          </FormField>
-          <FormField
-            label="Observation retry (seconds)"
-            error={errors.config?.retry_seconds?.message}
-          >
-            <input
-              type="number"
-              min=".05"
-              max="2"
-              step=".05"
-              {...register("config.retry_seconds", { valueAsNumber: true })}
-            />
-          </FormField>
-          <FormField label="Random seed" error={errors.config?.seed?.message}>
-            <input
-              type="number"
-              min="0"
-              max="2147483647"
-              {...register("config.seed", { valueAsNumber: true })}
-            />
-          </FormField>
-          <FormField label="Fake payment amount" error={errors.config?.amount?.message}>
-            <input
-              type="number"
-              min="1"
-              max="10000"
-              {...register("config.amount", { valueAsNumber: true })}
-            />
-          </FormField>
-          <FormField label="Stock quantity" error={errors.config?.quantity?.message}>
-            <input
-              type="number"
-              min="1"
               max="10"
-              {...register("config.quantity", { valueAsNumber: true })}
+              step="0.1"
+              {...register("config.fault.delay_seconds", { valueAsNumber: true })}
+            />
+          </FormField>
+          <FormField
+            label="Fault lease TTL (seconds)"
+            error={errors.config?.fault?.duration_seconds?.message}
+            hint="Expires independently of the experiment worker."
+          >
+            <input
+              type="number"
+              min="1"
+              max="30"
+              step="0.5"
+              {...register("config.fault.duration_seconds", { valueAsNumber: true })}
             />
           </FormField>
         </div>
-      </details>
-      {errors.config?.max_duration_seconds && (
-        <p className="field-error" role="alert">
-          {errors.config.max_duration_seconds.message}
-        </p>
+      </fieldset>
+      <fieldset className="wizard-section" hidden={step !== 2}>
+        <legend className="sr-only">Invariant and workflow constraints</legend>
+        {invariants.error ? (
+          <p className="inline-error" role="alert">
+            Cannot load registered invariants: {invariants.error.message}
+          </p>
+        ) : invariants.isPending ? (
+          <p className="muted">Loading invariants…</p>
+        ) : !invariants.data.length ? (
+          <p className="muted">
+            No registered invariants. Seed the demo or register a rule in settings before running.
+          </p>
+        ) : (
+          <div className="invariant-options">
+            {invariants.data.map((invariant) => (
+              <label key={invariant.id}>
+                <input type="checkbox" value={invariant.id} {...register("config.invariant_ids")} />
+                <span>
+                  <strong>{invariant.name}</strong>
+                  <small>
+                    {invariant.rule.kind} · {shortId(invariant.id)}
+                  </small>
+                </span>
+                <ShieldCheck size={16} />
+              </label>
+            ))}
+          </div>
+        )}
+        {errors.config?.invariant_ids && (
+          <p className="field-error" role="alert">
+            {errors.config.invariant_ids.message}
+          </p>
+        )}
+        <details className="advanced-config">
+          <summary>
+            <SlidersHorizontal size={14} />
+            Consistency window & workflow inputs
+            <ChevronDown size={14} />
+          </summary>
+          <div className="form-grid">
+            <FormField
+              label="Maximum duration (seconds)"
+              error={errors.config?.max_duration_seconds?.message}
+            >
+              <input
+                type="number"
+                min="10"
+                max="90"
+                {...register("config.max_duration_seconds", { valueAsNumber: true })}
+              />
+            </FormField>
+            <FormField
+              label="Consistency window (seconds)"
+              error={errors.config?.consistency_seconds?.message}
+            >
+              <input
+                type="number"
+                min="0"
+                max="15"
+                step="0.1"
+                {...register("config.consistency_seconds", { valueAsNumber: true })}
+              />
+            </FormField>
+            <FormField
+              label="Observation retry (seconds)"
+              error={errors.config?.retry_seconds?.message}
+            >
+              <input
+                type="number"
+                min=".05"
+                max="2"
+                step=".05"
+                {...register("config.retry_seconds", { valueAsNumber: true })}
+              />
+            </FormField>
+            <FormField label="Random seed" error={errors.config?.seed?.message}>
+              <input
+                type="number"
+                min="0"
+                max="2147483647"
+                {...register("config.seed", { valueAsNumber: true })}
+              />
+            </FormField>
+            <FormField label="Fake payment amount" error={errors.config?.amount?.message}>
+              <input
+                type="number"
+                min="1"
+                max="10000"
+                {...register("config.amount", { valueAsNumber: true })}
+              />
+            </FormField>
+            <FormField label="Stock quantity" error={errors.config?.quantity?.message}>
+              <input
+                type="number"
+                min="1"
+                max="10"
+                {...register("config.quantity", { valueAsNumber: true })}
+              />
+            </FormField>
+          </div>
+        </details>
+        {errors.config?.max_duration_seconds && (
+          <p className="field-error" role="alert">
+            {errors.config.max_duration_seconds.message}
+          </p>
+        )}
+      </fieldset>
+      {step === 3 && (
+        <div className="wizard-review" aria-label="Experiment scope review">
+          <div className="notice notice-neutral">
+            <ShieldCheck size={19} />
+            <div>
+              <strong>Bounded sandbox execution</strong>
+              <span>
+                The demo is reset under an exclusive lease. Fault cleanup is automatic; committed
+                business effects remain evidence.
+              </span>
+            </div>
+          </div>
+          <dl>
+            <div>
+              <dt>Definition</dt>
+              <dd>{values.name}</dd>
+            </div>
+            <div>
+              <dt>Target boundary</dt>
+              <dd>payment</dd>
+            </div>
+            <div>
+              <dt>Fault / phase</dt>
+              <dd>
+                {values.config.fault.kind} / {values.config.fault.phase}
+              </dd>
+            </div>
+            <div>
+              <dt>Fault lease</dt>
+              <dd>{values.config.fault.duration_seconds} seconds</dd>
+            </div>
+            <div>
+              <dt>Latency</dt>
+              <dd>{values.config.fault.delay_seconds} seconds</dd>
+            </div>
+            <div>
+              <dt>Run deadline</dt>
+              <dd>{values.config.max_duration_seconds} seconds</dd>
+            </div>
+            <div>
+              <dt>Consistency window</dt>
+              <dd>{values.config.consistency_seconds} seconds</dd>
+            </div>
+            <div>
+              <dt>Selected invariants</dt>
+              <dd>{values.config.invariant_ids.length}</dd>
+            </div>
+          </dl>
+          <p className="microcopy">
+            {invariants.data
+              ?.filter((rule) => values.config.invariant_ids.includes(rule.id))
+              .map((rule) => rule.name)
+              .join(" · ")}
+          </p>
+        </div>
       )}
-      <div className="builder-actions">
+      {step === 4 && accepted && (
+        <div className="wizard-accepted">
+          <ShieldCheck size={31} />
+          <h3>Execution accepted</h3>
+          <p>
+            The backend persisted this run. Its current status and invariant outcomes appear in the
+            execution monitor.
+          </p>
+          <code>{accepted.id}</code>
+          <Button type="button" variant="secondary" onClick={() => setStep(0)}>
+            Configure another experiment
+          </Button>
+        </div>
+      )}
+      {step < 4 && (
+        <div className="wizard-navigation">
+          <span>Progress is configuration only. Faults start after confirmation.</span>
+          {step > 0 && (
+            <Button type="button" variant="secondary" onClick={() => setStep(step - 1)}>
+              Back
+            </Button>
+          )}
+          {step < 3 && (
+            <Button
+              type="button"
+              onClick={() => {
+                void nextStep();
+              }}
+              disabled={step === 0 && !target}
+            >
+              Continue <ArrowRight size={14} />
+            </Button>
+          )}
+        </div>
+      )}
+      <div className="builder-actions" hidden={step !== 3}>
         <Button
           type="button"
           variant="secondary"
           disabled={save.isPending || start.isPending}
           control="execute"
-          onClick={handleSubmit((values) => save.mutate(values))}
+          onClick={handleSubmit((values) => save.mutate(values), revealInvalid)}
         >
           <Save size={14} />
           {save.isPending ? "Saving…" : "Save new definition"}

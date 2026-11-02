@@ -1,0 +1,53 @@
+# REVIEW ONLY: applying this Blueprint creates billable resources and publishes
+# the read-only API. It is not applied by CI. Explicit owner approval is required.
+services:
+  - type: web
+    name: failurelab-public-api
+    runtime: docker
+    repo: https://github.com/bhuvzzs24-spec/failurelab-x
+    branch: main
+    region: frankfurt
+    plan: 0.5c-512mb
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    dockerCommand: python scripts/cloud_start.py
+    autoDeployTrigger: 'off'
+    healthCheckPath: /ready
+    maxShutdownDelaySeconds: 45
+    envVars:
+      - key: APP_MODE
+        value: read_only
+      - key: DEPLOYMENT_ENV
+        value: cloud_read_only
+      - key: READONLY_DATABASE_ENFORCED
+        value: '1'
+      - key: AUTH_VIEWER_TOKEN
+        sync: false
+      # Use the SELECT-only failurelab_demo_reader URI with sslmode=require.
+      # Never put the database owner's connection string in this service.
+      - key: DATABASE_URL
+        sync: false
+      - key: REDIS_URL
+        fromService:
+          type: keyvalue
+          name: failurelab-public-limits
+          property: connectionString
+      # All browser requests go through Next; cross-origin browser access is off.
+      - key: CORS_ORIGINS
+        value: ''
+  - type: keyvalue
+    name: failurelab-public-limits
+    region: frankfurt
+    plan: 256mb
+    ipAllowList: []
+    maxmemoryPolicy: noeviction
+    persistenceMode: journal-snapshot
+
+databases:
+  - name: failurelab-public-data
+    databaseName: failurelab_public
+    user: failurelab_migration_owner
+    region: frankfurt
+    plan: 0.1c-256mb
+    diskSizeGB: 5
+    ipAllowList: []

@@ -1,4 +1,5 @@
 "use client";
+import { ReplayTimeline } from "./replay-timeline";
 import { useSummary } from "@/hooks/data";
 import { asText } from "@/lib/utils";
 import { AlertTriangle, LockKeyhole, Play } from "lucide-react";
@@ -36,11 +37,17 @@ export function Replay() {
             <div>
               <strong>Scenario reproducibility is not exact deterministic replay</strong>
               <span>
-                The Phase 1 backend stores reproduction metadata. It has no automatic replay
+                The execution engine stores reproduction metadata. It has no automatic replay
                 endpoint. Timing, image drift, and scheduling can differ.
               </span>
             </div>
           </div>
+          <Panel
+            title="Recorded failure sequence"
+            subtitle="Inspect the actual order of faults, workflows and authoritative observations"
+          >
+            <ReplayTimeline artifacts={summary?.artifacts ?? []} />
+          </Panel>
           <div className="two-columns">
             <Panel title="Original experiment configuration" subtitle="Immutable run snapshot">
               <FactLabel kind="observed" />

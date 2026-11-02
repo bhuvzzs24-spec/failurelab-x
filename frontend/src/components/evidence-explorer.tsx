@@ -57,6 +57,44 @@ export function EvidenceExplorer() {
         />
       ) : (
         <>
+          <div className="evidence-readout">
+            <div>
+              <span className="eyebrow">EXECUTION EVIDENCE</span>
+              <strong>
+                {summary?.artifacts.length ?? 0} artifacts{" "}
+                <span>/ {summary?.findings.length ?? 0} findings</span>
+              </strong>
+            </div>
+            <p>
+              Stored observations with provenance.
+              <br />
+              No synthetic logs or trace spans.
+            </p>
+          </div>
+          <div className="evidence-kind-tabs" aria-label="Evidence categories">
+            <button
+              aria-pressed={!kind}
+              onClick={() => {
+                setKind("");
+                setSelectedId("");
+              }}
+            >
+              All evidence <span>{summary?.artifacts.length ?? 0}</span>
+            </button>
+            {Array.from(new Set(summary?.artifacts.map((a) => a.kind))).map((value) => (
+              <button
+                key={value}
+                aria-pressed={kind === value}
+                onClick={() => {
+                  setKind(value);
+                  setSelectedId("");
+                }}
+              >
+                {value.replaceAll("_", " ")}
+                <span>{summary?.artifacts.filter((a) => a.kind === value).length ?? 0}</span>
+              </button>
+            ))}
+          </div>
           <div className="evidence-toolbar">
             <label className="search-field">
               <Search size={15} />

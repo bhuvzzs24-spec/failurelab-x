@@ -1,5 +1,5 @@
 "use client";
-import { useExperiments, useGraph } from "@/hooks/data";
+import { useExperiments, useGraph, useRuns } from "@/hooks/data";
 import type { Graph, Service } from "@/types/domain";
 import dagre from "@dagrejs/dagre";
 import {
@@ -16,6 +16,7 @@ import {
   type Edge,
   type Node,
   type NodeProps,
+  type ReactFlowInstance,
 } from "@xyflow/react";
 import {
   ArrowUpRight,
@@ -26,10 +27,12 @@ import {
   Search,
   Server,
   ShieldCheck,
+  RotateCcw,
 } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useMemo, useState } from "react";
 import { useProject } from "./providers";
+import { asObject, asText } from "@/lib/utils";
 import { Button } from "./ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "./ui/dialog";
 import { EmptyState, ErrorState, Loading } from "./ui/states";
@@ -83,7 +86,7 @@ export function graphLayout(
     marginy: 30,
   });
   graph.nodes.forEach((service) =>
-    layout.setNode(service.id, { width: 216, height: compact ? 84 : 136 }),
+    layout.setNode(service.id, { width: 240, height: compact ? 112 : 164 }),
   );
   graph.edges.forEach((edge) => layout.setEdge(edge.source_id, edge.target_id));
   dagre.layout(layout);
@@ -94,7 +97,7 @@ export function graphLayout(
         id: service.id,
         type: "service",
         ariaLabel: `Inspect ${service.name} service`,
-        position: { x: position.x - 108, y: position.y - (compact ? 42 : 68) },
+        position: { x: position.x - 120, y: position.y - (compact ? 56 : 82) },
         data: { service, focused: service.name === target, compact },
       };
     }),
@@ -130,8 +133,9 @@ function Canvas({
   onSelect: (service: Service) => void;
 }) {
   const initial = useMemo(() => graphLayout(graph, target, compact), [graph, target, compact]);
-  const [nodes, , onNodesChange] = useNodesState(initial.nodes);
-  const [edges, , onEdgesChange] = useEdgesState(initial.edges);
+  const [nodes, setNodes, onNodesChange] = useNodesState(initial.nodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(initial.edges);
+  const [flow, setFlow] = useState<ReactFlowInstance<ServiceNode, Edge> | null>(null);
   const onNodeClick = useCallback(
     (_event: React.MouseEvent, node: ServiceNode) => onSelect(node.data.service),
     [onSelect],
@@ -151,7 +155,27 @@ function Canvas({
         }
       }}
     >
+      {!compact && (
+        <Button
+          variant="secondary"
+          size="sm"
+          className="graph-layout-action"
+          aria-label="Reset graph layout"
+          disabled={!flow}
+          onClick={() => {
+            setNodes(initial.nodes);
+            setEdges(initial.edges);
+            requestAnimationFrame(() => {
+              void flow?.fitView({ padding: 0.2 });
+            });
+          }}
+        >
+          <RotateCcw size={13} />
+          Auto layout
+        </Button>
+      )}
       <ReactFlow
+        onInit={setFlow}
         nodes={nodes}
         edges={edges}
         nodeTypes={nodeTypes}
@@ -179,6 +203,7 @@ export function SystemGraph({ compact = false }: { compact?: boolean }) {
   const { projectId } = useProject();
   const query = useGraph(projectId);
   const definitions = useExperiments(projectId);
+  const runs = useRuns(projectId);
   const [search, setSearch] = useState("");
   const [experimentId, setExperimentId] = useState("");
   const [selected, setSelected] = useState<Service | null>(null);
@@ -257,7 +282,7 @@ export function SystemGraph({ compact = false }: { compact?: boolean }) {
       </div>
       {graph && graph.nodes.length > 0 ? (
         <Canvas
-          key={`${graph.nodes.map((node) => node.id).join("-")}:${experimentId}`}
+          key={`${JSON.stringify(graph)}:${experimentId}`}
           graph={graph}
           target={experiment?.config.fault.target ?? ""}
           compact={compact}
@@ -330,6 +355,37 @@ export function SystemGraph({ compact = false }: { compact?: boolean }) {
                     <ArrowUpRight size={14} />
                   </Link>
                 ))}
+              <h3>Recent boundary evidence</h3>
+              <div className="graph-inspection-evidence">
+                {runs.data?.items
+                  .filter(
+                    (run) =>
+                      asObject(run.config.fault).target === selected.name ||
+                      selected.name === "gateway",
+                  )
+                  .slice(0, 4)
+                  .map((run) => (
+                    <Link key={run.id} href={`/evidence?run=${run.id}`}>
+                      <span>
+                        {asText(asObject(run.config.fault).kind)} · {run.status}
+                      </span>
+                      <ArrowUpRight size={14} />
+                    </Link>
+                  ))}
+                {runs.error && (
+                  <p className="inline-error">Recent executions could not be loaded.</p>
+                )}
+                {runs.data &&
+                  !runs.data.items.some(
+                    (run) =>
+                      asObject(run.config.fault).target === selected.name ||
+                      selected.name === "gateway",
+                  ) && (
+                    <p className="microcopy">
+                      No matching boundary executions in the most recent page.
+                    </p>
+                  )}
+              </div>
               <Button asChild variant="secondary">
                 <Link href="/findings">
                   <GitBranch size={14} />

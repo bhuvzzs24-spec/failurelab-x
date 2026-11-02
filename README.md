@@ -4,6 +4,10 @@ A controlled distributed-systems correctness lab with executable system invarian
 
 The demonstration loses the acknowledgement of a committed payment: the charge exists while its order remains pending. Six additional seeded benchmark defect families exercise retries, finalization, stock drift, concurrency and compensation. These are synthetic known defects, not novel discoveries.
 
+## Permanent HTTPS hosting and redesigned interface
+
+The premium interface retains all existing engines and recorded evidence. [Design system](docs/DESIGN_SYSTEM.md) describes the redesigned workspaces. [Cloud setup](docs/CLOUD_SETUP.md) provides a separate Vercel/Render read-only deployment, private persistent data, strict viewer permissions and CI-gated releases. **No public URL has been deployed yet:** provider resource creation, costs, snapshot publication and release require owner approval. After an approved release, the permanent HTTPS hostname works without this Mac.
+
 ## Start on a Mac
 
 Install Docker Desktop (Engine + Compose v2), start its daemon, and have Python 3.12+ available as `python`:

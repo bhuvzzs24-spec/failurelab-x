@@ -32,3 +32,6 @@ venv
 logs
 tmp
 .mypy_cache
+
+.vercel
+**/.vercel

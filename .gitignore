@@ -57,3 +57,7 @@ frontend/next-env.d.ts
 
 # Preserve local sync-conflict environment files without publishing them.
 .env *.example
+
+# Provider-linked local metadata and pulled secret files
+.vercel/
+**/.vercel/

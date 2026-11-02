@@ -15,6 +15,10 @@ import {
   Legend,
 } from "recharts";
 import { z } from "zod";
+import { useSearchParams } from "next/navigation";
+import { CausalBoard } from "./causal-board";
+import { MeasuredBaselines, SequenceComparison, DecisionHistory } from "./research-insights";
+import { StatusBadge } from "./ui/status";
 import { toast } from "sonner";
 import { Play, Download, StopCircle, ShieldCheck, GitBranch } from "lucide-react";
 import {
@@ -25,6 +29,7 @@ import {
   type Trial,
 } from "@/lib/research";
 import { dateTime, shortId, asObject, asText } from "@/lib/utils";
+import { useAccess } from "./access";
 import { useProject } from "./providers";
 import { Button } from "./ui/button";
 import { Panel, Loading, ErrorState } from "./ui/states";
@@ -60,7 +65,7 @@ const budgetSchema = z.coerce.number().int().min(2).max(60);
 const hypothesisSchema = z.object({
   id: z.string(),
   description: z.string(),
-  status: z.string(),
+  status: z.enum(["UNTESTED", "SUPPORTED", "REFUTED", "INCONCLUSIVE"]),
   services: z.array(z.string()),
   assumptions: z.array(z.string()),
   supporting_observations: z.array(z.string()),
@@ -78,10 +83,14 @@ export function HypothesisGraph({
     position: { x: (i % 3) * 280, y: Math.floor(i / 3) * 130 },
     data: { label: `${h.description} · ${h.status}` },
     style: {
-      background: "#181b32",
+      background: "#202637",
       color: "#f1f2ff",
-      border: `1px solid ${h.status === "SUPPORTED" ? "#34d399" : "#747fa4"}`,
+      border: `1px solid ${h.status === "SUPPORTED" ? "#88d6b5" : "#727e9b"}`,
       width: 240,
+      borderRadius: 10,
+      padding: 17,
+      fontSize: 12,
+      lineHeight: 1.65,
     },
   }));
   const edges: Edge[] = hypotheses.slice(1).map((h) => ({
@@ -141,6 +150,54 @@ function ResultView({ job }: { job: ResearchJob }) {
     .safeParse(result.cases);
   return (
     <>
+      {job.kind === "SEARCH" && (
+        <div className="search-results-readout">
+          <div>
+            <strong>{asText(result.executed)}</strong>
+            <span>executed trials</span>
+          </div>
+          <div>
+            <strong>{asText(result.unique_bugs)}</strong>
+            <span>seeded defect families</span>
+          </div>
+          <div>
+            <strong>{asText(result.unique_violation_signatures)}</strong>
+            <span>violation signatures</span>
+          </div>
+          <div>
+            <strong>
+              {typeof result.execution_cost_seconds === "number"
+                ? result.execution_cost_seconds.toFixed(2) + "s"
+                : "Not recorded"}
+            </strong>
+            <span>measured trial cost</span>
+          </div>
+        </div>
+      )}
+      {job.kind === "REPAIR" && (
+        <div className="prepared-outcome">
+          <div>
+            <ShieldCheck size={22} />
+            <span>
+              <strong>Candidate prepared</strong>
+              <p>
+                A separate workspace contains the proposed policy change. Execution tests are
+                independent and may still be unavailable.
+              </p>
+            </span>
+          </div>
+          <dl>
+            {Object.entries(asObject(result.checks)).map(([name, value]) => (
+              <div key={name}>
+                <dt>{name.replaceAll("_", " ")}</dt>
+                <dd>
+                  <StatusBadge status={asText(value)} small />
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      )}
       {job.kind === "VERIFY" && (
         <div
           className="verification-outcome"
@@ -159,40 +216,25 @@ function ResultView({ job }: { job: ResearchJob }) {
       {hypotheses.success && (
         <>
           <HypothesisGraph hypotheses={hypotheses.data} />
-          <div className="research-hypotheses">
-            {hypotheses.data.map((h) => (
-              <article key={h.id}>
-                <span className="eyebrow">{h.status}</span>
-                <h3>{h.description}</h3>
-                <p>{h.intervention}</p>
-                <details>
-                  <summary>Assumptions & experimental evidence</summary>
-                  <JsonView value={h} />
-                </details>
-              </article>
-            ))}
-          </div>
+          <p className="causal-map-note">
+            Edges connect competing explanations; they do not assert proven causal dependencies.
+          </p>
+          <CausalBoard
+            hypotheses={hypotheses.data}
+            interpretation={
+              typeof result.interpretation === "string" ? result.interpretation : undefined
+            }
+          />
+          {result.model_proposals && (
+            <details className="model-proposal-boundary">
+              <summary>Model suggestions · proposals, not findings</summary>
+              <JsonView value={result.model_proposals} label="Unadjudicated model proposals" />
+            </details>
+          )}
         </>
       )}
       {job.kind === "MINIMIZE" && result.original && result.reduced ? (
-        <>
-          <div className="research-comparison">
-            <div>
-              <h3>Original sequence</h3>
-              <JsonView label="Original failure sequence" value={result.original} />
-            </div>
-            <div>
-              <h3>Reduced sequence</h3>
-              <JsonView label="Reduced failure sequence" value={result.reduced} />
-            </div>
-          </div>
-          <p className="microcopy">
-            Reproductions: {asText(result.reproductions)} / {asText(result.confirmation_trials)} ·
-            Local neighborhood audited:{" "}
-            {result.local_minimality_tested === true ? "yes" : "not established"}. This is not
-            global minimality.
-          </p>
-        </>
+        <SequenceComparison report={result} />
       ) : null}
       {matrix.success && matrix.data.length > 0 && (
         <div className="table-wrap">
@@ -210,8 +252,12 @@ function ResultView({ job }: { job: ResearchJob }) {
               {matrix.data.map((r) => (
                 <tr key={r.name}>
                   <td>{r.name}</td>
-                  <td>{r.original.classification}</td>
-                  <td>{r.candidate.classification}</td>
+                  <td>
+                    <StatusBadge status={r.original.classification} small />
+                  </td>
+                  <td>
+                    <StatusBadge status={r.candidate.classification} small />
+                  </td>
                   <td>{r.wall_overhead_seconds.toFixed(3)}</td>
                 </tr>
               ))}
@@ -245,13 +291,7 @@ function ResultView({ job }: { job: ResearchJob }) {
           </p>
         </>
       )}
-      <details
-        open={
-          !hypotheses.success &&
-          !comparisons.success &&
-          (!matrix.success || matrix.data.length === 0)
-        }
-      >
+      <details>
         <summary>Complete recorded report</summary>
         <JsonView value={result} label="Research job report" />
       </details>
@@ -268,6 +308,7 @@ export function ResearchWorkspace({
 }) {
   const { projectId } = useProject();
   const cache = useQueryClient();
+  const access = useAccess();
   const kind = kindFor[section];
   const [budget, setBudget] = useState("12");
   const [seed, setSeed] = useState("42");
@@ -275,18 +316,19 @@ export function ResearchWorkspace({
   const [defect, setDefect] = useState<(typeof defects)[number] | "all">("all");
   const [trialId, setTrialId] = useState("");
   const [candidateId, setCandidateId] = useState("");
-  const [jobId, setJobId] = useState("");
+  const requestedJob = useSearchParams()?.get("job") ?? "";
+  const [jobId, setJobId] = useState(requestedJob);
   const [pending, setPending] = useState<ResearchCreate | null>(null);
   const [validation, setValidation] = useState("");
   const jobs = useQuery({
     queryKey: ["research-jobs", projectId],
     queryFn: () => research.jobs(projectId),
-    refetchInterval: 2000,
+    refetchInterval: access.read_only ? 60000 : 2000,
   });
   const trials = useQuery({
     queryKey: ["research-trials", projectId],
     queryFn: () => research.trials(projectId),
-    refetchInterval: 5000,
+    refetchInterval: access.read_only ? 60000 : 5000,
   });
   const candidates = useQuery({
     queryKey: [
@@ -297,16 +339,15 @@ export function ResearchWorkspace({
         .map((j) => [j.id, j.status, j.updated_at]),
     ],
     queryFn: () => research.candidates(projectId),
-    refetchInterval: 5000,
+    refetchInterval: access.read_only ? 60000 : 5000,
   });
   const capabilities = useQuery({
     queryKey: ["research-capabilities"],
     queryFn: research.capabilities,
   });
-  const selected =
-    jobId
-      ? jobs.data?.find((j) => j.id === jobId)
-      : jobs.data?.filter((j) => j.kind === kind).sort((a, b) => b.created_at - a.created_at)[0];
+  const selected = jobId
+    ? jobs.data?.find((j) => j.id === jobId && j.kind === kind)
+    : jobs.data?.filter((j) => j.kind === kind).sort((a, b) => b.created_at - a.created_at)[0];
   const decisions = useQuery({
     queryKey: ["research-decisions", selected?.id, selected?.status],
     queryFn: () => research.decisions(selected!.id),
@@ -340,7 +381,8 @@ export function ResearchWorkspace({
     mutationFn: (body: ResearchCreate) => research.create(projectId, body),
     onSuccess: (j) => {
       cache.setQueryData<ResearchJob[]>(["research-jobs", projectId], (previous = []) => [
-        j, ...previous.filter((row) => row.id !== j.id),
+        j,
+        ...previous.filter((row) => row.id !== j.id),
       ]);
       setJobId(j.id);
       setPending(null);
@@ -363,7 +405,7 @@ export function ResearchWorkspace({
     onError: (e) => toast.error(e.message),
   });
   const history = useMemo(() => {
-    return (decisions.data ?? [])
+    return [...(decisions.data ?? [])]
       .sort((a, b) => a.step - b.step)
       .map((d, i, rows) => ({
         step: i + 1,
@@ -422,7 +464,8 @@ export function ResearchWorkspace({
     });
   }
   return (
-    <div className="workspace-stack research-workspace">
+    <div className={`workspace-stack research-workspace research-${section}`}>
+      {kind === "SEARCH" && <MeasuredBaselines jobs={jobs.data ?? []} />}
       <Panel
         title="Bounded research controls"
         subtitle="Managed local benchmark only · authoritative invariants · persistent evidence"
@@ -626,9 +669,26 @@ export function ResearchWorkspace({
           </p>
         ) : (
           <>
-            <p className="microcopy mono">
-              Execution {selected.id} · Deadline {dateTime(selected.deadline)}
-            </p>
+            <div className="job-record-meta">
+              <div>
+                <span>Execution ID</span>
+                <code>{shortId(selected.id)}</code>
+              </div>
+              <div>
+                <span>Recorded trials</span>
+                <strong>
+                  {trials.data?.filter((t) => t.job_id === selected.id).length ?? "—"}
+                </strong>
+              </div>
+              <div>
+                <span>Evidence artifacts</span>
+                <strong>{artifacts.data?.length ?? "—"}</strong>
+              </div>
+              <div>
+                <span>Deadline</span>
+                <strong>{dateTime(selected.deadline)}</strong>
+              </div>
+            </div>
             {selected.error && <p role="alert">{selected.error}</p>}
             {selected.status === "COMPLETED" ? (
               <ResultView job={selected} />
@@ -660,6 +720,7 @@ export function ResearchWorkspace({
               </LineChart>
             </ResponsiveContainer>
           </div>
+          <DecisionHistory decisions={decisions.data ?? []} />
           <details>
             <summary>Planner contexts, utilities and rewards</summary>
             <JsonView value={decisions.data} />

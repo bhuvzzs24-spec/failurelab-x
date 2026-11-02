@@ -35,7 +35,9 @@ async def auth(request:Request,authorization: str=Header(default=""),db:Session=
 
 @asynccontextmanager
 async def lifespan(app):
-    Policy.load() # invalid hosted secrets fail startup, before accepting traffic
+    policy=Policy.load() # invalid hosted secrets fail startup, before accepting traffic
+    from app.core.hosting import validate_public_deployment
+    await run_in_threadpool(validate_public_deployment,engine,policy,settings())
     yield
 
 app=FastAPI(title="FailureLab X",version="0.1.0",lifespan=lifespan,docs_url='/docs' if os.getenv('APP_MODE','local')=='local' else None,redoc_url=None,openapi_url='/openapi.json' if os.getenv('APP_MODE','local')=='local' else None,responses={401:{"model":ErrorResponse},422:{"model":ErrorResponse},409:{"model":ErrorResponse},404:{"model":ErrorResponse}})
@@ -44,6 +46,11 @@ configure(); instrument(app)
 from app.core.limits import BodyLimit
 app.add_middleware(BodyLimit)
 app.add_middleware(RequestContext)
+from app.core.hosting import cors_origins
+allowed_origins=cors_origins()
+if allowed_origins:
+    from starlette.middleware.cors import CORSMiddleware
+    app.add_middleware(CORSMiddleware,allow_origins=allowed_origins,allow_credentials=False,allow_methods=['GET'],allow_headers=['Authorization','Content-Type'],max_age=600)
 app.include_router(router,dependencies=[Depends(auth)])
 from app.api.overview import router as overview_router
 app.include_router(overview_router,dependencies=[Depends(auth)])

@@ -1,15 +1,19 @@
 import { expect, test, type Page } from "@playwright/test";
 
 async function confirmNewExecution(page: Page) {
-  const response = page.waitForResponse((r) =>
-    r.request().method() === "POST" && /\/research\/projects\/[^/]+\/jobs$/.test(r.url())
+  const response = page.waitForResponse(
+    (r) => r.request().method() === "POST" && /\/research\/projects\/[^/]+\/jobs$/.test(r.url()),
   );
   await page.getByRole("button", { name: "Confirm sandbox execution" }).click();
   const created = await response;
   expect(created.status()).toBe(202);
   const row = await created.json();
-  await expect(page.getByRole("combobox", { name: "Research job", exact: true })).toHaveValue(row.id);
-  await expect(page.getByRole("status").filter({ hasText: "COMPLETED" })).toBeVisible({ timeout: 120_000 });
+  await expect(page.getByRole("combobox", { name: "Research job", exact: true })).toHaveValue(
+    row.id,
+  );
+  await expect(page.getByRole("status").filter({ hasText: "COMPLETED" })).toBeVisible({
+    timeout: 120_000,
+  });
 }
 
 test("real research discovery → reduction → causal evidence → candidate → independent verification availability", async ({
@@ -30,7 +34,9 @@ test("real research discovery → reduction → causal evidence → candidate �
   await page.getByRole("spinbutton", { name: "Trial budget" }).fill("40");
   await page.getByRole("button", { name: "Reduce sequence", exact: true }).click();
   await confirmNewExecution(page);
-  await expect(page.getByLabel("Reduced failure sequence")).toContainText("payment_ack_loss");
+  await expect(page.getByLabel("Reduced failure sequence", { exact: true })).toContainText(
+    "payment_ack_loss",
+  );
   await page.goto("/ai");
   await page.getByRole("button", { name: "Test hypotheses", exact: true }).click();
   await confirmNewExecution(page);
@@ -66,7 +72,11 @@ test("read-only preview permits inspection and blocks all control mutations", as
   const origin = process.env.READONLY_BASE_URL;
   test.skip(!origin, "Read-only preview origin was not supplied");
   await page.goto(origin + "/experiments");
-  await expect(page.getByText(/Read-only demonstration/)).toBeVisible();
+  await expect(
+    page.getByRole("status").filter({ hasText: /Read-only demonstration/ }),
+  ).toBeVisible();
+  for (let step = 0; step < 3; step++)
+    await page.getByRole("button", { name: "Continue", exact: true }).click();
   await expect(page.getByRole("button", { name: "Review & run", exact: true })).toBeDisabled();
   const response = await page.request.post(origin + "/api/backend/api/v1/projects", {
     headers: { Origin: origin! },

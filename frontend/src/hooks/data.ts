@@ -1,4 +1,5 @@
 "use client";
+import { useAccess } from "@/components/access";
 import { api } from "@/lib/api";
 import { isActive } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
@@ -8,13 +9,15 @@ export const useGraph = (id: string) =>
     queryFn: ({ signal }) => api.graph(id, signal),
     enabled: !!id,
   });
-export const useOverview = (id: string) =>
-  useQuery({
+export const useOverview = (id: string) => {
+  const access = useAccess();
+  return useQuery({
     queryKey: ["overview", id],
     queryFn: ({ signal }) => api.overview(id, signal),
     enabled: !!id,
-    refetchInterval: 4000,
+    refetchInterval: access.read_only ? 60000 : 4000,
   });
+};
 export const useExperiments = (id: string) =>
   useQuery({
     queryKey: ["experiments", id],
@@ -35,17 +38,21 @@ export const useSummary = (id: string) =>
     refetchInterval: (query) =>
       query.state.data && !isActive(query.state.data.run.status) ? false : 1500,
   });
-export const useRuns = (id: string, offset = 0, status = "") =>
-  useQuery({
+export const useRuns = (id: string, offset = 0, status = "") => {
+  const access = useAccess();
+  return useQuery({
     queryKey: ["runs", id, offset, status],
     queryFn: ({ signal }) => api.runs(id, offset, status, signal),
     enabled: !!id,
-    refetchInterval: 3000,
+    refetchInterval: access.read_only ? 60000 : 3000,
   });
-export const useFindings = (id: string, offset = 0) =>
-  useQuery({
+};
+export const useFindings = (id: string, offset = 0) => {
+  const access = useAccess();
+  return useQuery({
     queryKey: ["findings", id, offset],
     queryFn: ({ signal }) => api.findings(id, offset, signal),
     enabled: !!id,
-    refetchInterval: 5000,
+    refetchInterval: access.read_only ? 60000 : 5000,
   });
+};

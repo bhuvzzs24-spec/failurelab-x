@@ -84,6 +84,10 @@ function mount(element: React.ReactNode) {
 function loaded<T>(value: T) {
   return { data: value, isPending: false, error: null, refetch: vi.fn() } as never;
 }
+async function advanceWizard(user: ReturnType<typeof userEvent.setup>, count: number) {
+  for (let i = 0; i < count; i++)
+    await user.click(screen.getByRole("button", { name: "Continue" }));
+}
 beforeEach(() => {
   navigation.params = new URLSearchParams();
   vi.clearAllMocks();
@@ -135,10 +139,11 @@ it("lays out only registered graph nodes and directional edges", () => {
 it("validates invalid fault parameters before opening confirmation", async () => {
   const user = userEvent.setup();
   mount(<ExperimentStudio />);
+  await advanceWizard(user, 1);
   const ttl = screen.getByLabelText(/Fault lease TTL/);
   await user.clear(ttl);
   await user.type(ttl, "31");
-  await user.click(screen.getByRole("button", { name: "Review & run" }));
+  await user.click(screen.getByRole("button", { name: "Continue" }));
   expect(await screen.findByRole("alert")).toBeInTheDocument();
   expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
   expect(api.start).not.toHaveBeenCalled();
@@ -147,6 +152,7 @@ it("requires confirmation and submits a real API mutation with an idempotency ke
   vi.mocked(api.start).mockResolvedValue({ ...run, status: "CREATED" });
   const user = userEvent.setup();
   mount(<ExperimentStudio />);
+  await advanceWizard(user, 3);
   await user.click(screen.getByRole("button", { name: "Review & run" }));
   expect(await screen.findByRole("alertdialog")).toHaveTextContent("Target: payment");
   expect(api.start).not.toHaveBeenCalled();
@@ -220,9 +226,11 @@ it("persists a changed configuration as a new definition before starting it", as
   vi.mocked(api.start).mockResolvedValue({ ...run, experiment_id: custom.id, status: "CREATED" });
   const user = userEvent.setup();
   mount(<ExperimentStudio />);
+  await advanceWizard(user, 1);
   const delay = screen.getByLabelText(/HTTP delay \(seconds\)/);
   await user.clear(delay);
   await user.type(delay, "1.8");
+  await advanceWizard(user, 2);
   await user.click(screen.getByRole("button", { name: "Review & run" }));
   await user.click(screen.getByRole("button", { name: "Start sandbox experiment" }));
   await waitFor(() =>
@@ -241,6 +249,7 @@ it("keeps a visible error when experiment submission fails", async () => {
   vi.mocked(api.start).mockRejectedValue(new Error("Backend rejected this run"));
   const user = userEvent.setup();
   mount(<ExperimentStudio />);
+  await advanceWizard(user, 3);
   await user.click(screen.getByRole("button", { name: "Review & run" }));
   await user.click(screen.getByRole("button", { name: "Start sandbox experiment" }));
   expect(await screen.findByRole("alert")).toHaveTextContent("Backend rejected this run");

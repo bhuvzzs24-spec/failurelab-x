@@ -1,0 +1,76 @@
+name: Approved public read-only release
+on:
+  workflow_run:
+    workflows: [Safe CI]
+    types: [completed]
+    branches: [main]
+permissions:
+  contents: read
+concurrency:
+  group: failurelab-public-release
+  cancel-in-progress: false
+jobs:
+  release:
+    if: >-
+      vars.FAILURELAB_PUBLIC_RELEASE_APPROVED == 'true' &&
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_branch == 'main' &&
+      github.event.workflow_run.head_repository.full_name == github.repository
+    # Provision an approved ephemeral private-network runner before enabling.
+    # The snapshot DB's default external IP allowlist is empty.
+    runs-on: [self-hosted, linux, x64, failurelab-cloud-release, ephemeral]
+    environment: public-read-only
+    timeout-minutes: 25
+    env:
+      FAILURELAB_PUBLIC_RELEASE_APPROVED: ${{ vars.FAILURELAB_PUBLIC_RELEASE_APPROVED }}
+      EXPECTED_REVISION: ${{ github.event.workflow_run.head_sha }}
+      PUBLIC_FRONTEND_ORIGIN: ${{ vars.PUBLIC_FRONTEND_ORIGIN }}
+      PUBLIC_BACKEND_ORIGIN: ${{ vars.PUBLIC_BACKEND_ORIGIN }}
+      VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          persist-credentials: false
+      - name: Refuse a superseded main revision
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          current=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq .object.sha)
+          test "$current" = "$EXPECTED_REVISION"
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with: {python-version: '3.12'}
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with: {node-version: '24'}
+      - run: python -m pip install -c constraints.txt .
+      - name: Apply additive migrations and enforce SELECT-only reader
+        env:
+          PUBLIC_SNAPSHOT_DATABASE: '1'
+          CLOUD_MIGRATION_DATABASE_URL: ${{ secrets.CLOUD_MIGRATION_DATABASE_URL }}
+          CLOUD_READER_PASSWORD: ${{ secrets.CLOUD_READER_PASSWORD }}
+        run: python scripts/cloud_database.py --approved
+      - name: Deploy and verify exact backend revision
+        env:
+          RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
+        run: python scripts/cloud_release.py backend --revision "$EXPECTED_REVISION"
+      - name: Build verified production frontend
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          npm ci --prefix frontend
+          npx --yes vercel@65.9.0 pull --yes --environment=production --token="$VERCEL_TOKEN"
+          npx --yes vercel@65.9.0 build --prod --token="$VERCEL_TOKEN"
+      - name: Publish approved production frontend
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: npx --yes vercel@65.9.0 deploy --prebuilt --prod --token="$VERCEL_TOKEN"
+      - name: Verify the permanent public URL externally
+        run: python scripts/cloud_release.py smoke --url "$PUBLIC_FRONTEND_ORIGIN" --revision "$EXPECTED_REVISION"
+      - name: Release status
+        if: always()
+        env:
+          RELEASE_STATUS: ${{ job.status }}
+        run: |
+          printf '## Public read-only release\n\nRevision: `%s`\n\nStatus: %s\n' "$EXPECTED_REVISION" "$RELEASE_STATUS" >> "$GITHUB_STEP_SUMMARY"

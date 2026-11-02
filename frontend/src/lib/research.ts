@@ -51,7 +51,7 @@ export async function evidenceBundle(jobId: string) {
     source_trial: sourceTrial,
     complete: job.status === "COMPLETED",
     limitations: [
-      "Bridge redacts secrets and local paths; artifact hashes identify original backend payloads.",
+      "Bridge redacts secrets and local paths; hashes identify recorded payloads. Redaction provenance may include prior source digests.",
       "A completed job may contain an infrastructure error or failed invariant; inspect outcomes.",
     ],
   };

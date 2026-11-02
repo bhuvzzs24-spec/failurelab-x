@@ -1,4 +1,6 @@
 "use client";
+import { useAccess } from "./access";
+import { JsonView } from "./evidence-common";
 import { useExperiments, useInvariants, useRuns, useGraph } from "@/hooks/data";
 import { api } from "@/lib/api";
 import { asObject, asText, dateTime, shortId } from "@/lib/utils";
@@ -529,6 +531,7 @@ function Builder({
   );
 }
 export function ExperimentStudio() {
+  const access = useAccess();
   const { projectId } = useProject();
   const params = useSearchParams();
   const router = useRouter();
@@ -557,10 +560,15 @@ export function ExperimentStudio() {
     <div className="page-stack">
       <div className="studio-grid">
         <Panel
-          title="Experiment builder"
+          title={access.recorded_demo ? "Recorded experiment definition" : "Experiment builder"}
           subtitle="Define the fault. Declare the constraint. Verify the outcome."
           action={
-            <Button variant="ghost" size="sm" onClick={() => setNewDefinition(true)}>
+            <Button
+              control="manage"
+              variant="ghost"
+              size="sm"
+              onClick={() => setNewDefinition(true)}
+            >
               <Plus size={14} />
               New
             </Button>
@@ -576,7 +584,7 @@ export function ExperimentStudio() {
                 setNewDefinition(!event.target.value);
               }}
             >
-              <option value="">Create a new definition</option>
+              {!access.recorded_demo && <option value="">Create a new definition</option>}
               {definitions.data.map((definition) => (
                 <option key={definition.id} value={definition.id}>
                   {definition.name}
@@ -584,15 +592,25 @@ export function ExperimentStudio() {
               ))}
             </select>
           </div>
-          <Builder
-            key={`${projectId}:${newDefinition ? "new" : (selected?.id ?? "new")}`}
-            definition={newDefinition ? undefined : selected}
-            onSaved={(id) => {
-              setChosen(id);
-              setNewDefinition(false);
-            }}
-            onRun={(run) => router.push(`/experiments?run=${run.id}`)}
-          />
+          {access.recorded_demo ? (
+            <>
+              <p className="microcopy">
+                Inspection only. The recorded fault configuration cannot be executed or modified in
+                this frontend demo.
+              </p>
+              <JsonView value={selected?.config ?? {}} label="Recorded experiment configuration" />
+            </>
+          ) : (
+            <Builder
+              key={`${projectId}:${newDefinition ? "new" : (selected?.id ?? "new")}`}
+              definition={newDefinition ? undefined : selected}
+              onSaved={(id) => {
+                setChosen(id);
+                setNewDefinition(false);
+              }}
+              onRun={(run) => router.push(`/experiments?run=${run.id}`)}
+            />
+          )}
         </Panel>
         <div className="studio-monitor">
           {runId ? (
@@ -606,10 +624,13 @@ export function ExperimentStudio() {
                 <div className="orbit-icon">
                   <FlaskConical size={30} />
                 </div>
-                <h3>Ready when you are</h3>
+                <h3>
+                  {access.recorded_demo ? "Live execution unavailable" : "Ready when you are"}
+                </h3>
                 <p>
-                  Choose a definition and review its fault scope. Live lifecycle events and
-                  invariant outcomes will appear here after the backend accepts the run.
+                  {access.recorded_demo
+                    ? "Choose a historical run below to inspect its recorded lifecycle, findings and evidence. This demo has no live experiment engine."
+                    : "Choose a definition and review its fault scope. Live lifecycle events and invariant outcomes will appear here after the backend accepts the run."}
                 </p>
                 <div className="monitor-stages">
                   <span>INJECT</span>

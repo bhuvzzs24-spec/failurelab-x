@@ -35,3 +35,5 @@ tmp
 
 .vercel
 **/.vercel
+
+frontend/demo-data/

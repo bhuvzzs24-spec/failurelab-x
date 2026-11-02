@@ -1,3 +1,4 @@
+import { demoEnvironment, recordedBridge } from "./recorded-demo";
 import { cloudConfiguration } from "./cloud-config";
 import { redact } from "@/lib/redact";
 
@@ -49,6 +50,7 @@ export async function bridge(
   segments: string[],
   env: Record<string, string | undefined> = process.env,
 ): Promise<Response> {
+  if (demoEnvironment(env)) return recordedBridge(request, segments, env);
   const path = segments.join("/");
   if (
     !segments.every((segment) => /^[A-Za-z0-9_-]+$/.test(segment)) ||
@@ -100,7 +102,7 @@ export async function bridge(
   if (!token) return error(503, "Server API connection is not configured");
   let upstream: URL;
   try {
-    upstream = new URL(env.BACKEND_URL ?? "http://127.0.0.1:8000");
+    upstream = new URL(env.BACKEND_URL ?? "");
     const localUpstream =
       !cloud &&
       upstream.protocol === "http:" &&

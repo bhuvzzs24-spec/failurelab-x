@@ -8,6 +8,8 @@ The demonstration loses the acknowledgement of a committed payment: the charge e
 
 The premium interface retains all existing engines and recorded evidence. [Design system](docs/DESIGN_SYSTEM.md) describes the redesigned workspaces. [Cloud setup](docs/CLOUD_SETUP.md) provides a separate Vercel/Render read-only deployment, private persistent data, strict viewer permissions and CI-gated releases. **No public URL has been deployed yet:** provider resource creation, costs, snapshot publication and release require owner approval. After an approved release, the permanent HTTPS hostname works without this Mac.
 
+For the no-backend, no-Render alternative, see [protected frontend-only preview preparation](docs/FRONTEND_ONLY_PREVIEW.md). It serves real recorded evidence, exposes no execution controls, and requires approval before any protected preview or evidence upload.
+
 ## Start on a Mac
 
 Install Docker Desktop (Engine + Compose v2), start its daemon, and have Python 3.12+ available as `python`:

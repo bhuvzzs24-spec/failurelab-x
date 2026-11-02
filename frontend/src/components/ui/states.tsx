@@ -1,10 +1,13 @@
+"use client";
+import { useAccess } from "../access";
 import { AlertCircle, ArrowUpRight, Database, SearchX } from "lucide-react";
 import Link from "next/link";
 import { Button } from "./button";
 export function Loading({ label = "Loading backend data" }: { label?: string }) {
+  const access = useAccess();
   return (
     <div aria-live="polite" aria-busy="true" className="loading-state">
-      <span className="sr-only">{label}</span>
+      <span className="sr-only">{access.recorded_demo ? "Loading recorded evidence" : label}</span>
       <div className="skeleton skeleton-title" />
       <div className="skeleton-grid">
         {[0, 1, 2, 3].map((i) => (
@@ -16,15 +19,22 @@ export function Loading({ label = "Loading backend data" }: { label?: string }) 
   );
 }
 export function ErrorState({ error, retry }: { error: unknown; retry?: () => void }) {
+  const access = useAccess();
   return (
     <div className="state-panel error-panel" role="alert">
       <AlertCircle />
-      <h2>Backend data is unavailable</h2>
+      <h2>
+        {access.recorded_demo ? "Recorded evidence is unavailable" : "Backend data is unavailable"}
+      </h2>
       <p>{error instanceof Error ? error.message : "The request could not be completed."}</p>
-      <p className="muted">No cached or example results are presented as live data.</p>
+      <p className="muted">
+        {access.recorded_demo
+          ? "No live backend is connected. Missing evidence is not replaced with fabricated results."
+          : "No cached or example results are presented as live data."}
+      </p>
       {retry && (
         <Button variant="secondary" onClick={retry}>
-          Retry connection
+          {access.recorded_demo ? "Retry evidence load" : "Retry connection"}
         </Button>
       )}
     </div>

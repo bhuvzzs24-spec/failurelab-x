@@ -1,4 +1,5 @@
 "use client";
+import { useAccess } from "./access";
 import { useOverview, useSummary } from "@/hooks/data";
 import { asObject, asText, relativeTime, shortId } from "@/lib/utils";
 import type { Artifact } from "@/types/domain";
@@ -64,6 +65,7 @@ export function TimelineList({ events, limit = 8 }: { events: Artifact[]; limit?
   );
 }
 export function Dashboard() {
+  const access = useAccess();
   const { projectId } = useProject();
   const query = useOverview(projectId);
   const overview = query.data;
@@ -95,10 +97,12 @@ export function Dashboard() {
       tone: "cyan",
     },
     {
-      label: "Active executions",
+      label: access.recorded_demo ? "Active at capture" : "Active executions",
       value: overview.active_run_count,
       icon: Activity,
-      detail: "Queued, running or verifying",
+      detail: access.recorded_demo
+        ? "Historical snapshot; no live jobs"
+        : "Queued, running or verifying",
       tone: "emerald",
     },
     {
@@ -117,7 +121,8 @@ export function Dashboard() {
           <span className="status-dot" /> Project observatory
         </span>
         <span>
-          Persisted observations <span className="context-separator">/</span> Live backend queries
+          Persisted observations <span className="context-separator">/</span>{" "}
+          {access.recorded_demo ? "Frozen demo dataset" : "Live backend queries"}
         </span>
       </div>
       <div className="metric-grid">
@@ -156,7 +161,7 @@ export function Dashboard() {
           <div className="pulse-number">
             <Activity size={19} />
             <strong>{overview.active_research_count ?? "—"}</strong>
-            <span>active research jobs</span>
+            <span>{access.recorded_demo ? "active jobs at capture" : "active research jobs"}</span>
           </div>
           <div className="pulse-facts">
             <div>

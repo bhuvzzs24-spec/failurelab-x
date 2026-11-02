@@ -38,6 +38,7 @@ jobs:
       - run: python scripts/test_ci.py
       - run: python scripts/check_secrets.py
       - run: python scripts/validate_cloud.py
+      - run: python scripts/validate_frontend_demo.py
   frontend:
     runs-on: ubuntu-24.04
     timeout-minutes: 15

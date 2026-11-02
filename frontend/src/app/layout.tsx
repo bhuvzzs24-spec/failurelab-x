@@ -8,11 +8,16 @@ export const metadata: Metadata = {
   title: "FailureLab X — Engineering certainty",
   description: "Controlled failure experiments. Executable invariants. Reproducible evidence.",
 };
+const recordedDemo =
+  process.env.DATA_MODE === "recorded_demo" || process.env.DEPLOYMENT_ENV === "frontend_demo";
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body>
-        <Providers readOnly={process.env.ACCESS_MODE === "read_only"}>
+        <Providers
+          readOnly={recordedDemo || process.env.ACCESS_MODE === "read_only"}
+          recordedDemo={recordedDemo}
+        >
           <Shell>{children}</Shell>
         </Providers>
       </body>

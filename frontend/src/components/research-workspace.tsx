@@ -466,126 +466,145 @@ export function ResearchWorkspace({
   return (
     <div className={`workspace-stack research-workspace research-${section}`}>
       {kind === "SEARCH" && <MeasuredBaselines jobs={jobs.data ?? []} />}
-      <Panel
-        title="Bounded research controls"
-        subtitle="Managed local benchmark only · authoritative invariants · persistent evidence"
-      >
-        <div className="research-controls">
-          {(kind === "SEARCH" || kind === "BENCHMARK") && (
-            <>
-              {kind === "SEARCH" && (
+      {access.recorded_demo && (
+        <Panel
+          title="Recorded research workspace"
+          subtitle="No live research or candidate execution is connected"
+        >
+          <p className="microcopy">
+            Select a historical job below to inspect measured outcomes. Discovery, reduction,
+            interventions, candidate preparation, verification and benchmark execution are
+            unavailable in this frontend-only demo.
+          </p>
+        </Panel>
+      )}
+      {!access.recorded_demo && (
+        <Panel
+          title="Bounded research controls"
+          subtitle={
+            access.recorded_demo
+              ? "Recorded configuration · execution unavailable in this demo"
+              : "Managed local benchmark only · authoritative invariants · persistent evidence"
+          }
+        >
+          <div className="research-controls">
+            {(kind === "SEARCH" || kind === "BENCHMARK") && (
+              <>
+                {kind === "SEARCH" && (
+                  <label>
+                    Selection strategy
+                    <select
+                      aria-label="Selection strategy"
+                      value={strategy}
+                      onChange={(e) => setStrategy(e.target.value as typeof strategy)}
+                    >
+                      {["adaptive", "random", "coverage"].map((s) => (
+                        <option key={s}>{s}</option>
+                      ))}
+                    </select>
+                  </label>
+                )}
                 <label>
-                  Selection strategy
+                  Benchmark defect
                   <select
-                    aria-label="Selection strategy"
-                    value={strategy}
-                    onChange={(e) => setStrategy(e.target.value as typeof strategy)}
+                    aria-label="Benchmark defect"
+                    value={defect}
+                    onChange={(e) => setDefect(e.target.value as typeof defect)}
                   >
-                    {["adaptive", "random", "coverage"].map((s) => (
-                      <option key={s}>{s}</option>
+                    <option value="all">All six defects</option>
+                    {defects.map((d) => (
+                      <option key={d} value={d}>
+                        {d.replaceAll("_", " ")}
+                      </option>
                     ))}
                   </select>
                 </label>
-              )}
+                {kind === "SEARCH" && (
+                  <label>
+                    Selection seed
+                    <input
+                      aria-label="Selection seed"
+                      type="number"
+                      value={seed}
+                      onChange={(e) => setSeed(e.target.value)}
+                    />
+                  </label>
+                )}
+              </>
+            )}
+            {!["REPAIR", "VERIFY"].includes(kind) && (
               <label>
-                Benchmark defect
+                {kind === "BENCHMARK" ? "Trials per strategy / seed" : "Trial budget"}
+                <input
+                  aria-label="Trial budget"
+                  type="number"
+                  min={2}
+                  max={60}
+                  value={budget}
+                  onChange={(e) => setBudget(e.target.value)}
+                />
+              </label>
+            )}
+            {["MINIMIZE", "INVESTIGATE", "REPAIR"].includes(kind) && (
+              <label>
+                Observed failure
                 <select
-                  aria-label="Benchmark defect"
-                  value={defect}
-                  onChange={(e) => setDefect(e.target.value as typeof defect)}
+                  aria-label="Observed failure"
+                  value={source?.id ?? ""}
+                  onChange={(e) => setTrialId(e.target.value)}
                 >
-                  <option value="all">All six defects</option>
-                  {defects.map((d) => (
-                    <option key={d} value={d}>
-                      {d.replaceAll("_", " ")}
+                  <option value="" disabled>
+                    Select original violation
+                  </option>
+                  {violations.map((t) => (
+                    <option key={t.id} value={t.id}>
+                      {t.scenario.defect} · {shortId(t.id)}
                     </option>
                   ))}
                 </select>
               </label>
-              {kind === "SEARCH" && (
-                <label>
-                  Selection seed
-                  <input
-                    aria-label="Selection seed"
-                    type="number"
-                    value={seed}
-                    onChange={(e) => setSeed(e.target.value)}
-                  />
-                </label>
-              )}
-            </>
-          )}
-          {!["REPAIR", "VERIFY"].includes(kind) && (
-            <label>
-              {kind === "BENCHMARK" ? "Trials per strategy / seed" : "Trial budget"}
-              <input
-                aria-label="Trial budget"
-                type="number"
-                min={2}
-                max={60}
-                value={budget}
-                onChange={(e) => setBudget(e.target.value)}
-              />
-            </label>
-          )}
-          {["MINIMIZE", "INVESTIGATE", "REPAIR"].includes(kind) && (
-            <label>
-              Observed failure
-              <select
-                aria-label="Observed failure"
-                value={source?.id ?? ""}
-                onChange={(e) => setTrialId(e.target.value)}
-              >
-                <option value="" disabled>
-                  Select original violation
-                </option>
-                {violations.map((t) => (
-                  <option key={t.id} value={t.id}>
-                    {t.scenario.defect} · {shortId(t.id)}
+            )}
+            {kind === "VERIFY" && (
+              <label>
+                Candidate patch
+                <select
+                  aria-label="Candidate patch"
+                  value={candidate?.id ?? ""}
+                  onChange={(e) => setCandidateId(e.target.value)}
+                >
+                  <option value="" disabled>
+                    Select prepared candidate
                   </option>
-                ))}
-              </select>
-            </label>
+                  {candidates.data?.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {shortId(c.id)} · {c.status}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
+            <Button control="execute" onClick={prepareJob} disabled={start.isPending}>
+              <Play size={14} />
+              {labels[kind]}
+            </Button>
+          </div>
+          {validation && <p role="alert">{validation}</p>}
+          {kind === "VERIFY" && capabilities.data?.repair_agent_configured === false && (
+            <p className="microcopy">
+              {access.recorded_demo
+                ? "Live verification is unavailable. Reports below are historical; no candidate executes in this demo."
+                : "Docker verification agent is not configured. A verification request will persist an infrastructure error; candidate code will not execute on this host."}
+            </p>
           )}
-          {kind === "VERIFY" && (
-            <label>
-              Candidate patch
-              <select
-                aria-label="Candidate patch"
-                value={candidate?.id ?? ""}
-                onChange={(e) => setCandidateId(e.target.value)}
-              >
-                <option value="" disabled>
-                  Select prepared candidate
-                </option>
-                {candidates.data?.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {shortId(c.id)} · {c.status}
-                  </option>
-                ))}
-              </select>
-            </label>
+          {kind === "BENCHMARK" && (
+            <p className="microcopy">
+              Runs random, coverage, and adaptive search using seeds 17, 42, 93 and the same budget
+              per pair, then separate held-out, witness, comparator and minimization controls.
+              Evaluation outcomes never train the planners. Every real HTTP trial consumes budget.
+            </p>
           )}
-          <Button control="execute" onClick={prepareJob} disabled={start.isPending}>
-            <Play size={14} />
-            {labels[kind]}
-          </Button>
-        </div>
-        {validation && <p role="alert">{validation}</p>}
-        {kind === "VERIFY" && capabilities.data?.repair_agent_configured === false && (
-          <p className="microcopy">
-            Docker verification agent is not configured. A verification request will persist an
-            infrastructure error; candidate code will not execute on this host.
-          </p>
-        )}
-        {kind === "BENCHMARK" && (
-          <p className="microcopy">
-            Runs random, coverage, and adaptive search using seeds 17, 42, 93 and the same budget
-            per pair, then separate held-out, witness, comparator and minimization controls.
-            Evaluation outcomes never train the planners. Every real HTTP trial consumes budget.
-          </p>
-        )}
-      </Panel>
+        </Panel>
+      )}
       <Dialog
         open={!!pending}
         onOpenChange={(v) => {

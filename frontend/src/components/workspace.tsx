@@ -1,4 +1,5 @@
 "use client";
+import { useAccess } from "./access";
 import type { Section } from "@/types/domain";
 import { ArrowUpRight, Play, Plus } from "lucide-react";
 import Link from "next/link";
@@ -81,11 +82,13 @@ const titles: Record<Section, { eyebrow: string; title: string; description: str
   },
 };
 export function Workspace({ section }: { section: Section }) {
+  const access = useAccess();
   const { projectId, loading, error, refetch } = useProject();
   const title = titles[section];
   let content: React.ReactNode;
   if (loading) content = <Loading />;
-  else if (error && section !== "settings") content = <ErrorState error={error} retry={refetch} />;
+  else if (error && (section !== "settings" || access.recorded_demo))
+    content = <ErrorState error={error} retry={refetch} />;
   else if (!projectId && section !== "settings") content = <NoProject />;
   else
     switch (section) {
@@ -143,7 +146,7 @@ export function Workspace({ section }: { section: Section }) {
               <Button asChild>
                 <Link href="/experiments">
                   <Play size={14} />
-                  Run experiment
+                  {access.recorded_demo ? "Inspect experiments" : "Run experiment"}
                 </Link>
               </Button>
             </>
@@ -152,7 +155,7 @@ export function Workspace({ section }: { section: Section }) {
             <Button asChild variant="secondary">
               <Link href="/settings">
                 <Plus size={14} />
-                Register services
+                {access.recorded_demo ? "Inspect registrations" : "Register services"}
               </Link>
             </Button>
           )}

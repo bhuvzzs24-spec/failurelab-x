@@ -53,9 +53,11 @@ export function useProject() {
 export function Providers({
   children,
   readOnly = false,
+  recordedDemo = false,
 }: {
   children: React.ReactNode;
   readOnly?: boolean;
+  recordedDemo?: boolean;
 }) {
   useEffect(() => {
     document.documentElement.dataset.contrast =
@@ -77,7 +79,7 @@ export function Providers({
   );
   return (
     <QueryClientProvider client={client}>
-      <AccessProvider readOnly={readOnly}>
+      <AccessProvider readOnly={readOnly} recordedDemo={recordedDemo}>
         <Projects>{children}</Projects>
       </AccessProvider>
       <Toaster theme="dark" richColors position="bottom-right" />

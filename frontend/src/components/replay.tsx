@@ -1,4 +1,5 @@
 "use client";
+import { useAccess } from "./access";
 import { ReplayTimeline } from "./replay-timeline";
 import { useSummary } from "@/hooks/data";
 import { asText } from "@/lib/utils";
@@ -8,6 +9,7 @@ import { JsonView, RunPicker, useRunLocation } from "./evidence-common";
 import { Button } from "./ui/button";
 import { EmptyState, ErrorState, FactLabel, Loading, Panel } from "./ui/states";
 export function Replay() {
+  const access = useAccess();
   const { runId, setRun } = useRunLocation();
   const query = useSummary(runId);
   const summary = query.data;
@@ -95,13 +97,16 @@ export function Replay() {
               <Button asChild>
                 <Link href={`/experiments?experiment=${summary?.run.experiment_id}`}>
                   <Play size={14} />
-                  Configure a new scenario run
+                  {access.recorded_demo
+                    ? "Inspect recorded definition"
+                    : "Configure a new scenario run"}
                 </Link>
               </Button>
             </div>
             <p className="microcopy">
-              A new scenario run creates new workflow keys and resets the sandbox. It is not
-              presented as replay of the original execution.
+              {access.recorded_demo
+                ? "Automatic replay and new scenario execution are unavailable. The timeline and instructions above are historical evidence."
+                : "A new scenario run creates new workflow keys and resets the sandbox. It is not presented as replay of the original execution."}
             </p>
           </Panel>
           <div className="two-columns">

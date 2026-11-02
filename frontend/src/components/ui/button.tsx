@@ -29,6 +29,7 @@ export function Button({
   const access = useAccess();
   const blocked =
     control === "execute" ? !access.can_execute : control === "manage" ? !access.can_manage : false;
+  if (control && access.recorded_demo) return null;
   const Comp = asChild ? Slot : "button";
   return (
     <Comp

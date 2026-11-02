@@ -2646,3 +2646,18 @@ select,
 .sr-only {
   clip-path: inset(50%);
 }
+
+.demo-banner {
+  display: grid;
+  gap: 5px;
+  color: #d3d5fb;
+  border-color: #625e9b;
+  background: #24243a;
+  line-height: 1.7;
+}
+.demo-banner strong {
+  font-size: 13px;
+}
+.demo-banner span {
+  font-size: 12px;
+}

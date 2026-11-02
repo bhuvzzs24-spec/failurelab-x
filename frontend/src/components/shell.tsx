@@ -54,13 +54,13 @@ export function Shell({ children }: { children: React.ReactNode }) {
   const health = useQuery({
     queryKey: ["health"],
     queryFn: () => request<{ status: string; version: string }>("health"),
-    refetchInterval: 15_000,
+    refetchInterval: access.recorded_demo ? false : 15_000,
     retry: false,
   });
   const ready = useQuery({
     queryKey: ["readiness"],
     queryFn: () => request<{ status: string }>("ready"),
-    refetchInterval: 15_000,
+    refetchInterval: access.recorded_demo ? false : 15_000,
     retry: false,
   });
   useEffect(() => {
@@ -134,7 +134,12 @@ export function Shell({ children }: { children: React.ReactNode }) {
           <div className="sandbox-note">
             <ShieldCheck size={16} />
             <span>
-              Execution boundary<small>Allowlisted sandbox targets</small>
+              {access.recorded_demo ? "Demo boundary" : "Execution boundary"}
+              <small>
+                {access.recorded_demo
+                  ? "No execution infrastructure"
+                  : "Allowlisted sandbox targets"}
+              </small>
             </span>
           </div>
           <a
@@ -199,20 +204,32 @@ export function Shell({ children }: { children: React.ReactNode }) {
             <span
               className={cn(
                 "connection-indicator",
-                health.isError ? "offline" : backendReady ? "ready" : "pending",
+                health.isError
+                  ? "offline"
+                  : access.recorded_demo
+                    ? "pending"
+                    : backendReady
+                      ? "ready"
+                      : "pending",
               )}
               title={
-                ready.isError ? "API reachable; database or broker not ready" : "Backend connection"
+                access.recorded_demo
+                  ? "Recorded evidence served by this frontend; no live backend"
+                  : ready.isError
+                    ? "API reachable; database or broker not ready"
+                    : "Backend connection"
               }
             >
               <span className="status-dot" />
-              {health.isPending
-                ? "Connecting"
-                : health.isError
-                  ? "API offline"
-                  : backendReady
-                    ? "Backend ready"
-                    : "API connected"}
+              {access.recorded_demo
+                ? "Recorded demo · no live backend"
+                : health.isPending
+                  ? "Connecting"
+                  : health.isError
+                    ? "API offline"
+                    : backendReady
+                      ? "Backend ready"
+                      : "API connected"}
             </span>
             <Button
               variant="ghost"

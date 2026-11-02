@@ -1,4 +1,6 @@
 "use client";
+import { useAccess } from "./access";
+import { RecordedDemoSettings } from "./recorded-demo-settings";
 import { useGraph, useInvariants } from "@/hooks/data";
 import { api, registration, request } from "@/lib/api";
 import { shortId } from "@/lib/utils";
@@ -23,6 +25,10 @@ const serviceSchema = z.object({
   resource: z.string().max(128),
 });
 export function Settings() {
+  const access = useAccess();
+  return access.recorded_demo ? <RecordedDemoSettings /> : <ConnectedSettings />;
+}
+function ConnectedSettings() {
   const { projects, projectId, setProjectId } = useProject();
   const client = useQueryClient();
   const graph = useGraph(projectId);

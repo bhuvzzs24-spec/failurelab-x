@@ -61,3 +61,6 @@ frontend/next-env.d.ts
 # Provider-linked local metadata and pulled secret files
 .vercel/
 **/.vercel/
+
+# Private, reviewed frontend evidence; upload only with separate preview approval.
+frontend/demo-data/

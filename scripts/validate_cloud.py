@@ -21,6 +21,9 @@ def validate():
     for required in ("vars.FAILURELAB_PUBLIC_RELEASE_APPROVED == 'true'","github.event.workflow_run.conclusion == 'success'",'failurelab-cloud-release','secrets.CLOUD_MIGRATION_DATABASE_URL','--revision "$EXPECTED_REVISION"','--prebuilt --prod','public-read-only'):
         assert required in release,required
     assert '--token' not in release,'Keep provider credentials in protected step environments, never process arguments'
+    release_steps=yaml.safe_load(release)['jobs']['release']['steps']
+    credential_steps=[step['name'] for step in release_steps if 'VERCEL_TOKEN' in step.get('env',{})]
+    assert credential_steps==['Pull approved production environment','Publish approved production frontend'],'Do not expose provider account credentials to dependency installation or application builds'
     client=(ROOT/'frontend/src/lib/api.ts').read_text()
     assert 'fetch(`/api/backend/${path}`' in client and 'localhost' not in client and 'NEXT_PUBLIC_' not in client
     print('Static cloud boundaries passed: readonly API, private persistence, no workers, gated release, same-origin client.')

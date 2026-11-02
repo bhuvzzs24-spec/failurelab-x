@@ -55,13 +55,14 @@ jobs:
         env:
           RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
         run: python scripts/cloud_release.py backend --revision "$EXPECTED_REVISION"
-      - name: Build verified production frontend
+      - name: Install verified frontend dependencies
+        run: npm ci --prefix frontend
+      - name: Pull approved production environment
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-        run: |
-          npm ci --prefix frontend
-          npx --yes vercel@65.9.0 pull --yes --environment=production
-          npx --yes vercel@65.9.0 build --prod
+        run: npx --yes vercel@65.9.0 pull --yes --environment=production
+      - name: Build verified production frontend
+        run: npx --yes vercel@65.9.0 build --prod
       - name: Publish approved production frontend
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}

@@ -60,12 +60,12 @@ jobs:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
         run: |
           npm ci --prefix frontend
-          npx --yes vercel@65.9.0 pull --yes --environment=production --token="$VERCEL_TOKEN"
-          npx --yes vercel@65.9.0 build --prod --token="$VERCEL_TOKEN"
+          npx --yes vercel@65.9.0 pull --yes --environment=production
+          npx --yes vercel@65.9.0 build --prod
       - name: Publish approved production frontend
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-        run: npx --yes vercel@65.9.0 deploy --prebuilt --prod --token="$VERCEL_TOKEN"
+        run: npx --yes vercel@65.9.0 deploy --prebuilt --prod
       - name: Verify the permanent public URL externally
         run: python scripts/cloud_release.py smoke --url "$PUBLIC_FRONTEND_ORIGIN" --revision "$EXPECTED_REVISION"
       - name: Release status

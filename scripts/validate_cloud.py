@@ -20,6 +20,7 @@ def validate():
     release=(ROOT/'.github/workflows/cloud-release.yml').read_text()
     for required in ("vars.FAILURELAB_PUBLIC_RELEASE_APPROVED == 'true'","github.event.workflow_run.conclusion == 'success'",'failurelab-cloud-release','secrets.CLOUD_MIGRATION_DATABASE_URL','--revision "$EXPECTED_REVISION"','--prebuilt --prod','public-read-only'):
         assert required in release,required
+    assert '--token' not in release,'Keep provider credentials in protected step environments, never process arguments'
     client=(ROOT/'frontend/src/lib/api.ts').read_text()
     assert 'fetch(`/api/backend/${path}`' in client and 'localhost' not in client and 'NEXT_PUBLIC_' not in client
     print('Static cloud boundaries passed: readonly API, private persistence, no workers, gated release, same-origin client.')
